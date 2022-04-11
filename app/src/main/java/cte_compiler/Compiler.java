@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import cte_compiler.tokenizer.TOKEN_TYPES;
+import cte_compiler.tokenizer.Token;
+import cte_compiler.tokenizer.Tokenizer;
 
 /**
  * Links all the various compiler components together. It
@@ -59,16 +61,29 @@ public class Compiler {
         this.comparators.put("<", TOKEN_TYPES.COMPARATOR.name());
     }
 
+    // -------------------------------------------------------------------------------
     /**
+     * COMPILE
+     * 
      * Steps through all the compiler stages to convert a source program gotten from
      * a user to the output language
      * 
      * @return ArrayList<String> --> Line by line array of strings in output
      *         language
      */
+    // -------------------------------------------------------------------------------
     public ArrayList<String> compile() {
 
         // ---- STAGE 1: read input and create tokens ----
+
+        Tokenizer tokenizer = new Tokenizer(this.keywords, this.operators, this.symbols, this.comparators);
+        tokenizer.readInput("Enter program line by line", "DONE"); // use DONE as value to end input
+        System.out.println(tokenizer.getUserInput());
+        tokenizer.createTokens();
+        ArrayList<Token> tokens = tokenizer.getTokens();
+        for (Token t : tokens) {
+            System.out.println(t.type + ": " + t.value);
+        }
 
         return null;
     }

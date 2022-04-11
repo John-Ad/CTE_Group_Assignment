@@ -1,11 +1,13 @@
 package cte_compiler.tokenizer;
 
-class Token {
-    public String type;
+public class Token {
+    public TOKEN_TYPES type;
     public String value;
+    public int lineNumber;
 
-    public Token(String type, String value) {
+    public Token(TOKEN_TYPES type, String value, int lineNumber) {
         this.type = type;
         this.value = value;
+        this.lineNumber = lineNumber;
     }
 }
