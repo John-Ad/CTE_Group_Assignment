@@ -3,6 +3,10 @@ package cte_compiler;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cte_compiler.grammar_enums.KEYWORDS;
+import cte_compiler.syntax_analyzer.NonTerminalNode;
+import cte_compiler.syntax_analyzer.ParseTreeGenerator;
+import cte_compiler.syntax_analyzer.Node;
 import cte_compiler.tokenizer.TOKEN_TYPES;
 import cte_compiler.tokenizer.Token;
 import cte_compiler.tokenizer.Tokenizer;
@@ -35,13 +39,13 @@ public class Compiler {
         this.comparators = new HashMap<>();
 
         // ---- initialize kewords map ----
-        this.keywords.put("var", TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put("print", TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put("if", TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put("then", TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put("while", TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put("do", TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put("end", TOKEN_TYPES.KEYWORD.name());
+        this.keywords.put(KEYWORDS.VAR.toString(), TOKEN_TYPES.KEYWORD.name());
+        this.keywords.put(KEYWORDS.PRINT.toString(), TOKEN_TYPES.KEYWORD.name());
+        this.keywords.put(KEYWORDS.IF.toString(), TOKEN_TYPES.KEYWORD.name());
+        this.keywords.put(KEYWORDS.THEN.toString(), TOKEN_TYPES.KEYWORD.name());
+        this.keywords.put(KEYWORDS.WHILE.toString(), TOKEN_TYPES.KEYWORD.name());
+        this.keywords.put(KEYWORDS.DO.toString(), TOKEN_TYPES.KEYWORD.name());
+        this.keywords.put(KEYWORDS.END.toString(), TOKEN_TYPES.KEYWORD.name());
 
         // ---- initialize operators map ----
         this.operators.put("*", TOKEN_TYPES.OPERATOR.name());
@@ -79,11 +83,19 @@ public class Compiler {
         Tokenizer tokenizer = new Tokenizer(this.keywords, this.operators, this.symbols, this.comparators);
         tokenizer.readInput("Enter program line by line", "DONE"); // use DONE as value to end input
         System.out.println(tokenizer.getUserInput());
+
         tokenizer.createTokens();
         ArrayList<Token> tokens = tokenizer.getTokens();
         for (Token t : tokens) {
             System.out.println(t.type + ": " + t.value);
         }
+
+        // ---- STAGE 2: convert tokens into parse tree ----
+
+        ParseTreeGenerator parseTreeGenerator = new ParseTreeGenerator(tokens);
+        parseTreeGenerator.generate();
+        NonTerminalNode root = parseTreeGenerator.getTree();
+        parseTreeGenerator.printTerminals(root);
 
         return null;
     }
