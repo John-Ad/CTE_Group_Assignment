@@ -66,8 +66,6 @@ public class ParseTreeGenerator {
                 break; // exit loop if one of the statements not matched
             }
 
-            currenTokenIndex++;
-
             // exit loop if no tokens are left
             if (currenTokenIndex >= tokens.size())
                 break;
@@ -100,7 +98,7 @@ public class ParseTreeGenerator {
 
         // print statement
         if (token.value.toLowerCase().equals(KEYWORDS.PRINT.toString().toLowerCase())) {
-            printStatement();
+            printStatement(stmt);
         }
     }
 
@@ -147,7 +145,36 @@ public class ParseTreeGenerator {
     private void assignmentStatement() {
     }
 
-    private void printStatement() {
+    private void printStatement(NonTerminalNode parent) {
+
+        // add print keyword
+        parent.children.add(new TerminalNode(KEYWORDS.PRINT.toString(), parent, tokens.get(currenTokenIndex)));
+
+        // advance to next token
+        currenTokenIndex++;
+
+        if (currenTokenIndex >= tokens.size())
+            return;
+
+        Token token = tokens.get(currenTokenIndex);
+
+        // add string literal
+        if (token.type == TOKEN_TYPES.LITERAL) {
+            parent.children.add(new TerminalNode(token.value, parent, token));
+        }
+
+        // add identifier
+        if (token.type == TOKEN_TYPES.IDENTIFIER) {
+            parent.children.add(new TerminalNode(token.value, parent, token));
+        }
+
+        // add number
+        if (token.type == TOKEN_TYPES.NUMBER) {
+            parent.children.add(new TerminalNode(token.value, parent, token));
+        }
+
+        // advance to next token
+        currenTokenIndex++;
     }
 
     // -------------------------------------
@@ -161,6 +188,9 @@ public class ParseTreeGenerator {
 
         // add first term
         term(expr);
+
+        if (currenTokenIndex >= tokens.size())
+            return;
 
         Token token = tokens.get(currenTokenIndex);
 
@@ -214,6 +244,9 @@ public class ParseTreeGenerator {
 
         // add first primary
         primary(term);
+
+        if (currenTokenIndex >= tokens.size())
+            return;
 
         Token token = tokens.get(currenTokenIndex);
 

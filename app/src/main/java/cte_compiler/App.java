@@ -3,7 +3,7 @@
  *          LANGUAGE GRAMMAR:
  * 
  *    prog ::= {stmt}
- *    stmt ::= "print" (expr | string) ;
+ *    stmt ::= "print" (number | id | string) ;
  *        |    "var" id "=" (expr | string) ;
  *        |    id = expr ;
  *        |    "while" comp "do" {stmt} "end" ;
