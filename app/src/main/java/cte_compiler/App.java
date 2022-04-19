@@ -11,8 +11,7 @@
  *    comp ::= expr (comp_op expr)
  *    comp_op ::= ( "==" | "<" | ">" | ">=" | "<=" | "!=")
  *    expr ::= term {("+" | "-") term}
- *    term ::= unary {( "/" | "*" ) unary}
- *    unary ::= [ "+" | "-" ] primary
+ *    term ::= primary {( "/" | "*" ) primary}
  *    primary ::= digit{ digit }
  *    digit ::= ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7"| "8" | "9" )
  *    id ::= string

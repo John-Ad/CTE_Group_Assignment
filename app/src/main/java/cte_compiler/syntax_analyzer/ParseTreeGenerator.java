@@ -152,6 +152,7 @@ public class ParseTreeGenerator {
 
     // -------------------------------------
 
+    // ---- EXPRESSION NON TERMINAL ----
     private void expression(NonTerminalNode parent) {
 
         // add expression non-terminal
@@ -160,6 +161,26 @@ public class ParseTreeGenerator {
 
         // add first term
         term(expr);
+
+        Token token = tokens.get(currenTokenIndex);
+
+        // add rest of expression
+        while (token.value.equals("-") || token.value.equals("+")) {
+            // add operator
+            expr.children.add(new TerminalNode(token.value, expr, token));
+
+            // advance to next token
+            currenTokenIndex++;
+
+            // add term
+            term(expr);
+
+            if (currenTokenIndex >= tokens.size()) {
+                break;
+            }
+
+            token = tokens.get(currenTokenIndex);
+        }
     }
 
     // ---- IDENITFIER NON TERMINAL ----
@@ -193,6 +214,26 @@ public class ParseTreeGenerator {
 
         // add first primary
         primary(term);
+
+        Token token = tokens.get(currenTokenIndex);
+
+        // add rest of expression
+        while (token.value.equals("*") || token.value.equals("/")) {
+            // add operator
+            term.children.add(new TerminalNode(token.value, term, token));
+
+            // advance to next token
+            currenTokenIndex++;
+
+            // add term
+            primary(term);
+
+            if (currenTokenIndex >= tokens.size()) {
+                break;
+            }
+
+            token = tokens.get(currenTokenIndex);
+        }
     }
 
     private void primary(NonTerminalNode parent) {
