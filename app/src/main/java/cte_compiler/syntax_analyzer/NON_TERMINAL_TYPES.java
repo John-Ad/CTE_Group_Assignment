@@ -4,5 +4,10 @@ public enum NON_TERMINAL_TYPES {
     PROGRAM,
     STATEMENT,
     EXPRESSION,
-    IDENTIFIER
+    IDENTIFIER,
+    TERM,
+    PRIMARY,
+    UNARY,
+    NUM,
+    DIGIT
 }

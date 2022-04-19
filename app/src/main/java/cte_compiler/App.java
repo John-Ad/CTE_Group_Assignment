@@ -4,7 +4,7 @@
  * 
  *    prog ::= {stmt}
  *    stmt ::= "print" (expr | string) ;
- *        |    "var" id "=" expr ;
+ *        |    "var" id "=" (expr | string) ;
  *        |    id = expr ;
  *        |    "while" comp "do" {stmt} "end" ;
  *        |    "if" comp "then" {stmt} "end" 
@@ -13,8 +13,7 @@
  *    expr ::= term {("+" | "-") term}
  *    term ::= unary {( "/" | "*" ) unary}
  *    unary ::= [ "+" | "-" ] primary
- *    primary ::= num | id
- *    num ::= digit{ digit }
+ *    primary ::= digit{ digit }
  *    digit ::= ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7"| "8" | "9" )
  *    id ::= string
  * 

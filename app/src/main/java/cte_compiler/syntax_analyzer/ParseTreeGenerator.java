@@ -3,6 +3,7 @@ package cte_compiler.syntax_analyzer;
 import java.util.ArrayList;
 
 import cte_compiler.grammar_enums.KEYWORDS;
+import cte_compiler.grammar_enums.SYMBOLS;
 import cte_compiler.tokenizer.TOKEN_TYPES;
 import cte_compiler.tokenizer.Token;
 
@@ -29,14 +30,14 @@ import cte_compiler.tokenizer.Token;
  */
 
 public class ParseTreeGenerator {
-    private NonTerminalNode tree;
+    private NonTerminalNode treeRoot;
     private ArrayList<Token> tokens;
 
     private int currenTokenIndex; // tracks current token
 
     // ---- CONSTRUCTOR ----
     public ParseTreeGenerator(ArrayList<Token> tokens) {
-        this.tree = new NonTerminalNode(NON_TERMINAL_TYPES.PROGRAM.name(), null);
+        this.treeRoot = new NonTerminalNode(NON_TERMINAL_TYPES.PROGRAM.name(), null);
 
         this.tokens = tokens;
         this.currenTokenIndex = 0;
@@ -60,7 +61,7 @@ public class ParseTreeGenerator {
 
             // add statement node
             if (token.type == TOKEN_TYPES.KEYWORD || token.type == TOKEN_TYPES.IDENTIFIER) {
-                statement(this.tree);
+                statement(this.treeRoot);
             } else {
                 break; // exit loop if one of the statements not matched
             }
@@ -93,25 +94,48 @@ public class ParseTreeGenerator {
         // decide which branch to continue down
 
         // var statement
-        if (token.value == KEYWORDS.VAR.toString())
+        if (token.value.toLowerCase().equals(KEYWORDS.VAR.toString().toLowerCase())) {
             declarationStatement(stmt);
+        }
 
         // print statement
-        if (token.value == KEYWORDS.PRINT.toString())
+        if (token.value.toLowerCase().equals(KEYWORDS.PRINT.toString().toLowerCase())) {
             printStatement();
+        }
     }
 
     // ---- DECLARATION STATEMENT ----
 
     private void declarationStatement(NonTerminalNode parent) {
-        // add var terminal keyword to tree
+
+        // add var keyword
         parent.children.add(new TerminalNode(KEYWORDS.VAR.toString(), parent, tokens.get(currenTokenIndex)));
 
         // advance to next token
         currenTokenIndex++;
 
-        // add identifier to tree
+        // add identifier
         identifier(parent);
+
+        // add =
+        parent.children.add(new TerminalNode(SYMBOLS.ASSIGNMENT.toString(), parent, tokens.get(currenTokenIndex)));
+
+        // advance to next token
+        currenTokenIndex++;
+
+        Token token = tokens.get(currenTokenIndex);
+
+        // add expression
+        if (token.type == TOKEN_TYPES.NUMBER)
+            expression(parent);
+
+        // add string literal
+        if (token.type == TOKEN_TYPES.LITERAL) {
+            parent.children.add(new TerminalNode(token.value, parent, token));
+
+            // move to next token
+            currenTokenIndex++;
+        }
     }
 
     private void ifStatement() {
@@ -128,7 +152,14 @@ public class ParseTreeGenerator {
 
     // -------------------------------------
 
-    private void expression() {
+    private void expression(NonTerminalNode parent) {
+
+        // add expression non-terminal
+        NonTerminalNode expr = new NonTerminalNode(NON_TERMINAL_TYPES.EXPRESSION.name(), parent);
+        parent.children.add(expr);
+
+        // add first term
+        term(expr);
     }
 
     // ---- IDENITFIER NON TERMINAL ----
@@ -140,30 +171,57 @@ public class ParseTreeGenerator {
         NonTerminalNode id = new NonTerminalNode(NON_TERMINAL_TYPES.IDENTIFIER.name(), parent);
 
         // add terminal as child to id
-        id.children.add(new TerminalNode(token.value, parent, token));
+        id.children.add(new TerminalNode(token.value, id, token));
 
         // add id to tree
-        parent.children.add(new NonTerminalNode(NON_TERMINAL_TYPES.IDENTIFIER.name(), parent));
+        parent.children.add(id);
+
+        // advance to next token
+        currenTokenIndex++;
 
     }
 
     private void comparison() {
+
     }
 
-    private void term() {
+    private void term(NonTerminalNode parent) {
+
+        // add term non-terminal
+        NonTerminalNode term = new NonTerminalNode(NON_TERMINAL_TYPES.TERM.name(), parent);
+        parent.children.add(term);
+
+        // add first primary
+        primary(term);
     }
 
-    private void primary() {
+    private void primary(NonTerminalNode parent) {
+
+        // add primary non-terminal
+        NonTerminalNode primary = new NonTerminalNode(NON_TERMINAL_TYPES.PRIMARY.name(), parent);
+        parent.children.add(primary);
+
+        // add number
+        number(primary);
     }
 
-    private void number() {
-    }
+    private void number(NonTerminalNode parent) {
 
-    private void digit() {
+        // add number non-terminal
+        NonTerminalNode num = new NonTerminalNode(NON_TERMINAL_TYPES.NUM.name(), parent);
+        parent.children.add(num);
+
+        Token token = tokens.get(currenTokenIndex);
+
+        // add number
+        num.children.add(new TerminalNode(token.value, num, token));
+
+        // move to next token
+        currenTokenIndex++;
     }
 
     public NonTerminalNode getTree() {
-        return this.tree;
+        return this.treeRoot;
     }
 
     /**
@@ -180,6 +238,7 @@ public class ParseTreeGenerator {
          * if non terminal, go through all children
          * in order from left to right
          */
+
         if (node instanceof NonTerminalNode) {
             NonTerminalNode ntNode = (NonTerminalNode) node;
             for (Node n : ntNode.children) {
@@ -195,4 +254,5 @@ public class ParseTreeGenerator {
             System.out.println(tNode.value + " ");
         }
     }
+
 }
