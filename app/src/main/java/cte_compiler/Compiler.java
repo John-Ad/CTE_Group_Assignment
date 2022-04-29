@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import cte_compiler.syntax_analyzer.NonTerminalNode;
 import cte_compiler.syntax_analyzer.ParseTreeGenerator;
-import cte_compiler.syntax_analyzer.Node;
 import cte_compiler.tokenizer.TOKEN_TYPES;
 import cte_compiler.tokenizer.Token;
 import cte_compiler.tokenizer.Tokenizer;
@@ -41,6 +40,7 @@ public class Compiler {
 
         // ---- initialize symbols map ----
         this.symbols.put("=", TOKEN_TYPES.SYMBOL.name());
+        this.symbols.put(";", TOKEN_TYPES.SYMBOL.name());
     }
 
     // -------------------------------------------------------------------------------
@@ -70,10 +70,10 @@ public class Compiler {
 
         // ---- STAGE 2: convert tokens into parse tree ----
 
-        // ParseTreeGenerator parseTreeGenerator = new ParseTreeGenerator(tokens);
-        // parseTreeGenerator.generate();
-        // NonTerminalNode root = parseTreeGenerator.getTree();
-        // parseTreeGenerator.printTerminals(root);
+        ParseTreeGenerator parseTreeGenerator = new ParseTreeGenerator(tokens);
+        parseTreeGenerator.generate();
+        NonTerminalNode root = parseTreeGenerator.getTree();
+        parseTreeGenerator.printTerminals(root);
 
         return null;
     }

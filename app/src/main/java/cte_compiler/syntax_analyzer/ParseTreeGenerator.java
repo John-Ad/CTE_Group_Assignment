@@ -2,7 +2,6 @@ package cte_compiler.syntax_analyzer;
 
 import java.util.ArrayList;
 
-import cte_compiler.grammar_enums.SYMBOLS;
 import cte_compiler.tokenizer.TOKEN_TYPES;
 import cte_compiler.tokenizer.Token;
 
@@ -10,10 +9,11 @@ import cte_compiler.tokenizer.Token;
  * 
  *          LANGUAGE GRAMMAR:
  * 
- *    expr ::= term {("+" | "-") term}
- *    term ::= num {( "/" | "*" ) num}
- *    num ::= digit{ digit }
- *    digit ::= ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7"| "8" | "9" )
+ *    expr -> term + expr | term - expr | term
+ *    term -> number * term | number / term | number
+ * 
+ *    number -> digit{ digit }
+ *    digit -> ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7"| "8" | "9" )
  * 
  */
 
@@ -43,34 +43,8 @@ public class ParseTreeGenerator {
             return;
         }
 
-        // loop until all statements have been checked
-        while (true) {
-            Token token = tokens.get(currenTokenIndex);
-
-            // exit loop if no tokens are left
-            if (currenTokenIndex >= tokens.size())
-                break;
-        }
-
-    }
-
-    // --------------------------------------
-    //
-    // STATEMENT GRAMMAR FUNCTIONS
-    //
-    // --------------------------------------
-
-    // ---- ROOT STATEMENT ----
-
-    private void statement(NonTerminalNode parent) {
-
-        // add statement node to tree
-        NonTerminalNode stmt = new NonTerminalNode(NON_TERMINAL_TYPES.STATEMENT.toString(), parent);
-        parent.children.add(stmt);
-
-        Token token = tokens.get(currenTokenIndex);
-
-        // decide which branch to continue down
+        // check expression
+        expression(this.treeRoot);
     }
 
     // ---- EXPRESSION NON TERMINAL ----
@@ -80,66 +54,65 @@ public class ParseTreeGenerator {
         NonTerminalNode expr = new NonTerminalNode(NON_TERMINAL_TYPES.EXPRESSION.name(), parent);
         parent.children.add(expr);
 
-        // add first term
-        term(expr);
-
+        // check if there are still tokens left
         if (currenTokenIndex >= tokens.size())
             return;
 
         Token token = tokens.get(currenTokenIndex);
 
-        // add rest of expression
-        while (token.value.equals("-") || token.value.equals("+")) {
-            // add operator
-            expr.children.add(new TerminalNode(token.value, expr, token));
+        // add term
+        term(expr);
 
-            // advance to next token
+        // return if there are no tokens
+        if (currenTokenIndex >= tokens.size())
+            return;
+
+        // get next token
+        token = tokens.get(currenTokenIndex);
+
+        // if token is minus/plus op, add op terminal and add next expr
+        if (token.value.equals("+") || token.value.equals("-")) {
+            expr.children.add(new TerminalNode(token.value, expr, token));
             currenTokenIndex++;
 
-            // add term
-            term(expr);
-
-            if (currenTokenIndex >= tokens.size()) {
-                break;
-            }
-
-            token = tokens.get(currenTokenIndex);
+            expression(expr);
         }
     }
 
+    // ---- TERM NON TERMINAL ----
     private void term(NonTerminalNode parent) {
 
         // add term non-terminal
         NonTerminalNode term = new NonTerminalNode(NON_TERMINAL_TYPES.TERM.name(), parent);
         parent.children.add(term);
 
-        // add first primary
-        // primary(term);
-
+        // check if there are still tokens left
         if (currenTokenIndex >= tokens.size())
             return;
 
+        // get next token
         Token token = tokens.get(currenTokenIndex);
 
-        // add rest of expression
-        while (token.value.equals("*") || token.value.equals("/")) {
-            // add operator
-            term.children.add(new TerminalNode(token.value, term, token));
+        // add number
+        number(term);
 
-            // advance to next token
+        // return if there are no tokens
+        if (currenTokenIndex >= tokens.size())
+            return;
+
+        // get next token
+        token = tokens.get(currenTokenIndex);
+
+        // if token is mult/div op, add op terminal and add next term
+        if (token.value.equals("*") || token.value.equals("/")) {
+            term.children.add(new TerminalNode(token.value, term, token));
             currenTokenIndex++;
 
-            // add term
-            // primary(term);
-
-            if (currenTokenIndex >= tokens.size()) {
-                break;
-            }
-
-            token = tokens.get(currenTokenIndex);
+            term(term);
         }
     }
 
+    // ---- TERM NON TERMINAL ----
     private void number(NonTerminalNode parent) {
 
         // add number non-terminal
