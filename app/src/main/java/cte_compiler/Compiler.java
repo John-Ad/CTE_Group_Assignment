@@ -3,7 +3,6 @@ package cte_compiler;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cte_compiler.grammar_enums.KEYWORDS;
 import cte_compiler.syntax_analyzer.NonTerminalNode;
 import cte_compiler.syntax_analyzer.ParseTreeGenerator;
 import cte_compiler.syntax_analyzer.Node;
@@ -23,29 +22,16 @@ import cte_compiler.tokenizer.Tokenizer;
 
 public class Compiler {
 
-    private HashMap<String, String> keywords;
     private HashMap<String, String> operators;
     private HashMap<String, String> symbols;
-    private HashMap<String, String> comparators;
 
     // ---- CONSTRUCTOR ----
 
     public Compiler() {
 
         // ---- create empty map objects ----
-        this.keywords = new HashMap<>();
         this.operators = new HashMap<>();
         this.symbols = new HashMap<>();
-        this.comparators = new HashMap<>();
-
-        // ---- initialize kewords map ----
-        this.keywords.put(KEYWORDS.VAR.toString(), TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put(KEYWORDS.PRINT.toString(), TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put(KEYWORDS.IF.toString(), TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put(KEYWORDS.THEN.toString(), TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put(KEYWORDS.WHILE.toString(), TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put(KEYWORDS.DO.toString(), TOKEN_TYPES.KEYWORD.name());
-        this.keywords.put(KEYWORDS.END.toString(), TOKEN_TYPES.KEYWORD.name());
 
         // ---- initialize operators map ----
         this.operators.put("*", TOKEN_TYPES.OPERATOR.name());
@@ -55,14 +41,6 @@ public class Compiler {
 
         // ---- initialize symbols map ----
         this.symbols.put("=", TOKEN_TYPES.SYMBOL.name());
-
-        // ---- initialize comparators map ----
-        this.comparators.put("==", TOKEN_TYPES.COMPARATOR.name());
-        this.comparators.put("<=", TOKEN_TYPES.COMPARATOR.name());
-        this.comparators.put(">=", TOKEN_TYPES.COMPARATOR.name());
-        this.comparators.put("!=", TOKEN_TYPES.COMPARATOR.name());
-        this.comparators.put(">", TOKEN_TYPES.COMPARATOR.name());
-        this.comparators.put("<", TOKEN_TYPES.COMPARATOR.name());
     }
 
     // -------------------------------------------------------------------------------
@@ -80,8 +58,8 @@ public class Compiler {
 
         // ---- STAGE 1: read input and create tokens ----
 
-        Tokenizer tokenizer = new Tokenizer(this.keywords, this.operators, this.symbols, this.comparators);
-        tokenizer.readInput("Enter program line by line", "DONE"); // use DONE as value to end input
+        Tokenizer tokenizer = new Tokenizer(this.operators, this.symbols);
+        tokenizer.readInput("Enter statement: "); // use DONE as value to end input
         System.out.println(tokenizer.getUserInput());
 
         tokenizer.createTokens();
@@ -92,10 +70,10 @@ public class Compiler {
 
         // ---- STAGE 2: convert tokens into parse tree ----
 
-        ParseTreeGenerator parseTreeGenerator = new ParseTreeGenerator(tokens);
-        parseTreeGenerator.generate();
-        NonTerminalNode root = parseTreeGenerator.getTree();
-        parseTreeGenerator.printTerminals(root);
+        // ParseTreeGenerator parseTreeGenerator = new ParseTreeGenerator(tokens);
+        // parseTreeGenerator.generate();
+        // NonTerminalNode root = parseTreeGenerator.getTree();
+        // parseTreeGenerator.printTerminals(root);
 
         return null;
     }

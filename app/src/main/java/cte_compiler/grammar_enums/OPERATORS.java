@@ -1,17 +1,14 @@
 package cte_compiler.grammar_enums;
 
-public enum KEYWORDS {
-    PRINT("print"),
-    VAR("var"),
-    IF("if"),
-    THEN("then"),
-    WHILE("while"),
-    DO("do"),
-    END("end");
+public enum OPERATORS {
+    PLUS("+"),
+    MINUS("-"),
+    DIV("/"),
+    MULT("*");
 
     private final String text;
 
-    KEYWORDS(final String text) {
+    OPERATORS(final String text) {
         this.text = text;
     }
 

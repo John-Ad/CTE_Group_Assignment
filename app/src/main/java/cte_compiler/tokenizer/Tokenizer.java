@@ -24,15 +24,12 @@ public class Tokenizer {
 
     private ArrayList<Token> tokens;
 
-    private HashMap<String, String> keywords;
     private HashMap<String, String> operators;
     private HashMap<String, String> symbols;
-    private HashMap<String, String> comparators;
 
     // ---- CONSTRUCTOR ----
 
-    public Tokenizer(HashMap<String, String> keywords, HashMap<String, String> operators,
-            HashMap<String, String> symbols, HashMap<String, String> comparators) {
+    public Tokenizer(HashMap<String, String> operators, HashMap<String, String> symbols) {
 
         // init input variables
         this.scanner = new Scanner(System.in);
@@ -43,10 +40,8 @@ public class Tokenizer {
         this.tokens = new ArrayList<>();
 
         // set maps to values passed in
-        this.keywords = keywords;
         this.operators = operators;
         this.symbols = symbols;
-        this.comparators = comparators;
     }
 
     /**
@@ -67,14 +62,8 @@ public class Tokenizer {
             // skip whitespace
             skipWhiteSpace();
 
-            // check for comparator
-            parseComparator();
-
             // check for number
             parseNumber();
-
-            // check for string literal
-            parseStringLiteral();
 
             /**
              * code above changes index while code below
@@ -94,12 +83,6 @@ public class Tokenizer {
             if (operators.containsKey(Character.toString(userInput.charAt(currentIndex)))) {
                 tokens.add(new Token(TOKEN_TYPES.OPERATOR,
                         Character.toString(userInput.charAt(currentIndex)), currentLineNumber));
-            }
-
-            // check for word
-            if (Character.isAlphabetic(userInput.charAt(currentIndex))) {
-                parseIdentifier();
-                continue; // move to next iteration of loop
             }
 
             // move to next char
@@ -147,97 +130,6 @@ public class Tokenizer {
 
     /**
      * ------------------------------------------------
-     * PARSE IDENTIFIER
-     * 
-     * parses variable identifiers and keywords
-     * ------------------------------------------------
-     */
-    private void parseIdentifier() {
-        String str = "";
-        while (true) {
-            str += userInput.charAt(currentIndex);
-
-            currentIndex++;
-
-            if (currentIndex >= userInput.length()) {
-                break;
-            }
-
-            // check if next char is operator
-            if (operators.containsKey(Character.toString(userInput.charAt(currentIndex)))) {
-                break;
-            }
-
-            // check if next char is symbol
-            if (symbols.containsKey(Character.toString(userInput.charAt(currentIndex)))) {
-                break;
-            }
-
-            // check if next char is comparator
-            if (comparators.containsKey(Character.toString(userInput.charAt(currentIndex)))) {
-                break;
-            }
-
-            // check if brace etc is next char
-            // if
-            // (bracesBracketsEtc.containsKey(Character.toString(userInput.charAt(currentIndex))))
-            // {
-            // break;
-            // }
-
-            // check for space, tab, or newline, commas
-            if (userInput.charAt(currentIndex) == '\t' || userInput.charAt(currentIndex) == '\n'
-                    || userInput.charAt(currentIndex) == ' ' || userInput.charAt(currentIndex) == ',') {
-                break;
-            }
-        }
-
-        if (this.keywords.containsKey(str)) {
-            tokens.add(new Token(TOKEN_TYPES.KEYWORD, str, currentLineNumber));
-        } else {
-            tokens.add(new Token(TOKEN_TYPES.IDENTIFIER, str, currentLineNumber));
-        }
-    }
-
-    /**
-     * ------------------------------------------------
-     * PARSE STRING LITERAL
-     * 
-     * parses string literals
-     * ------------------------------------------------
-     */
-    private void parseStringLiteral() {
-        if (currentIndex >= userInput.length()) {
-            return;
-        }
-
-        // check if currnet char is quote
-        if (userInput.charAt(currentIndex) == '"') {
-
-            String str = "";
-
-            // loop until end of literal found
-            while (true) {
-
-                currentIndex++;
-                if (currentIndex >= userInput.length()) {
-                    System.out.println("End of string not found! Expected closing \" ");
-                    return;
-                }
-
-                if (userInput.charAt(currentIndex) == '"') {
-                    break;
-                }
-
-                str += userInput.charAt(currentIndex);
-            }
-
-            tokens.add(new Token(TOKEN_TYPES.LITERAL, str, currentLineNumber));
-        }
-    }
-
-    /**
-     * ------------------------------------------------
      * PARSE NUMBER
      * 
      * parses numbers
@@ -271,46 +163,6 @@ public class Tokenizer {
 
     /**
      * ------------------------------------------------
-     * PARSE COMPARATOR
-     * 
-     * parses comparator values
-     * ------------------------------------------------
-     */
-    private void parseComparator() {
-        if (currentIndex >= userInput.length()) {
-            return;
-        }
-
-        String comp = "";
-
-        // check if there is more input
-        if (currentIndex + 1 < userInput.length()) {
-
-            // check single char
-            comp = Character.toString(userInput.charAt(currentIndex))
-                    + Character.toString(userInput.charAt(currentIndex + 1));
-
-            // check if comp is comparator
-            if (comparators.containsKey(comp)) {
-                tokens.add(new Token(TOKEN_TYPES.COMPARATOR, comp, currentLineNumber));
-                currentIndex += 2;
-                return;
-            }
-        }
-
-        // check single char
-        comp = Character.toString(userInput.charAt(currentIndex));
-
-        // check if single char is a comparator
-        if (comparators.containsKey(comp)) {
-            tokens.add(new Token(TOKEN_TYPES.COMPARATOR, comp, currentLineNumber));
-            currentIndex++;
-        }
-
-    }
-
-    /**
-     * ------------------------------------------------
      * READ INPUT
      * 
      * reads source program line by line from the command line.
@@ -325,31 +177,11 @@ public class Tokenizer {
      * @
      * ------------------------------------------------
      */
-    public void readInput(String prompt, String donePrompt) {
+    public void readInput(String prompt) {
         System.out.println("\n" + prompt);
-        System.out.println("\nEnter " + donePrompt + " to finish input.");
 
-        int lineNumber = 1; // display line number for user
-        String line = ""; // store current lines input
-
-        // loop until user enters done value
-        while (true) {
-            // print line number
-            System.out.print(Integer.toString(lineNumber) + ": ");
-
-            // read current line and add to rest of input
-            line = scanner.nextLine();
-
-            // exit loop if done value is entered
-            if (donePrompt.toLowerCase().equals(line.strip().toLowerCase())) {
-                break;
-            }
-
-            // add line to rest of input
-            userInput += line + "\n";
-
-            lineNumber++;
-        }
+        // read current line and add to rest of input
+        this.userInput = scanner.nextLine();
 
         // set current index to 0 incase it was changed
         currentIndex = 0;

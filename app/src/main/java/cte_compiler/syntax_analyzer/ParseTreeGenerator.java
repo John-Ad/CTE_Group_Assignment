@@ -2,7 +2,6 @@ package cte_compiler.syntax_analyzer;
 
 import java.util.ArrayList;
 
-import cte_compiler.grammar_enums.KEYWORDS;
 import cte_compiler.grammar_enums.SYMBOLS;
 import cte_compiler.tokenizer.TOKEN_TYPES;
 import cte_compiler.tokenizer.Token;
@@ -11,21 +10,10 @@ import cte_compiler.tokenizer.Token;
  * 
  *          LANGUAGE GRAMMAR:
  * 
- *    prog ::= {stmt}
- *    stmt ::= "print" (expr | string) ;
- *        |    "var" id "=" expr ;
- *        |    id = expr ;
- *        |    "while" comp "do" {stmt} "end" ;
- *        |    "if" comp "then" {stmt} "end" 
- *    comp ::= expr (comp_op expr)
- *    comp_op ::= ( "==" | "<" | ">" | ">=" | "<=" | "!=")
  *    expr ::= term {("+" | "-") term}
- *    term ::= unary {( "/" | "*" ) unary}
- *    unary ::= [ "+" | "-" ] primary
- *    primary ::= num | id
+ *    term ::= num {( "/" | "*" ) num}
  *    num ::= digit{ digit }
  *    digit ::= ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7"| "8" | "9" )
- *    id ::= string
  * 
  */
 
@@ -59,13 +47,6 @@ public class ParseTreeGenerator {
         while (true) {
             Token token = tokens.get(currenTokenIndex);
 
-            // add statement node
-            if (token.type == TOKEN_TYPES.KEYWORD || token.type == TOKEN_TYPES.IDENTIFIER) {
-                statement(this.treeRoot);
-            } else {
-                break; // exit loop if one of the statements not matched
-            }
-
             // exit loop if no tokens are left
             if (currenTokenIndex >= tokens.size())
                 break;
@@ -90,94 +71,7 @@ public class ParseTreeGenerator {
         Token token = tokens.get(currenTokenIndex);
 
         // decide which branch to continue down
-
-        // var statement
-        if (token.value.toLowerCase().equals(KEYWORDS.VAR.toString().toLowerCase())) {
-            declarationStatement(stmt);
-        }
-
-        // print statement
-        if (token.value.toLowerCase().equals(KEYWORDS.PRINT.toString().toLowerCase())) {
-            printStatement(stmt);
-        }
     }
-
-    // ---- DECLARATION STATEMENT ----
-
-    private void declarationStatement(NonTerminalNode parent) {
-
-        // add var keyword
-        parent.children.add(new TerminalNode(KEYWORDS.VAR.toString(), parent, tokens.get(currenTokenIndex)));
-
-        // advance to next token
-        currenTokenIndex++;
-
-        // add identifier
-        identifier(parent);
-
-        // add =
-        parent.children.add(new TerminalNode(SYMBOLS.ASSIGNMENT.toString(), parent, tokens.get(currenTokenIndex)));
-
-        // advance to next token
-        currenTokenIndex++;
-
-        Token token = tokens.get(currenTokenIndex);
-
-        // add expression
-        if (token.type == TOKEN_TYPES.NUMBER)
-            expression(parent);
-
-        // add string literal
-        if (token.type == TOKEN_TYPES.LITERAL) {
-            parent.children.add(new TerminalNode(token.value, parent, token));
-
-            // move to next token
-            currenTokenIndex++;
-        }
-    }
-
-    private void ifStatement() {
-    }
-
-    private void whileStatement() {
-    }
-
-    private void assignmentStatement() {
-    }
-
-    private void printStatement(NonTerminalNode parent) {
-
-        // add print keyword
-        parent.children.add(new TerminalNode(KEYWORDS.PRINT.toString(), parent, tokens.get(currenTokenIndex)));
-
-        // advance to next token
-        currenTokenIndex++;
-
-        if (currenTokenIndex >= tokens.size())
-            return;
-
-        Token token = tokens.get(currenTokenIndex);
-
-        // add string literal
-        if (token.type == TOKEN_TYPES.LITERAL) {
-            parent.children.add(new TerminalNode(token.value, parent, token));
-        }
-
-        // add identifier
-        if (token.type == TOKEN_TYPES.IDENTIFIER) {
-            parent.children.add(new TerminalNode(token.value, parent, token));
-        }
-
-        // add number
-        if (token.type == TOKEN_TYPES.NUMBER) {
-            parent.children.add(new TerminalNode(token.value, parent, token));
-        }
-
-        // advance to next token
-        currenTokenIndex++;
-    }
-
-    // -------------------------------------
 
     // ---- EXPRESSION NON TERMINAL ----
     private void expression(NonTerminalNode parent) {
@@ -213,29 +107,6 @@ public class ParseTreeGenerator {
         }
     }
 
-    // ---- IDENITFIER NON TERMINAL ----
-    private void identifier(NonTerminalNode parent) {
-
-        Token token = tokens.get(currenTokenIndex);
-
-        // create id non terminal
-        NonTerminalNode id = new NonTerminalNode(NON_TERMINAL_TYPES.IDENTIFIER.name(), parent);
-
-        // add terminal as child to id
-        id.children.add(new TerminalNode(token.value, id, token));
-
-        // add id to tree
-        parent.children.add(id);
-
-        // advance to next token
-        currenTokenIndex++;
-
-    }
-
-    private void comparison() {
-
-    }
-
     private void term(NonTerminalNode parent) {
 
         // add term non-terminal
@@ -243,7 +114,7 @@ public class ParseTreeGenerator {
         parent.children.add(term);
 
         // add first primary
-        primary(term);
+        // primary(term);
 
         if (currenTokenIndex >= tokens.size())
             return;
@@ -259,7 +130,7 @@ public class ParseTreeGenerator {
             currenTokenIndex++;
 
             // add term
-            primary(term);
+            // primary(term);
 
             if (currenTokenIndex >= tokens.size()) {
                 break;
@@ -269,20 +140,10 @@ public class ParseTreeGenerator {
         }
     }
 
-    private void primary(NonTerminalNode parent) {
-
-        // add primary non-terminal
-        NonTerminalNode primary = new NonTerminalNode(NON_TERMINAL_TYPES.PRIMARY.name(), parent);
-        parent.children.add(primary);
-
-        // add number
-        number(primary);
-    }
-
     private void number(NonTerminalNode parent) {
 
         // add number non-terminal
-        NonTerminalNode num = new NonTerminalNode(NON_TERMINAL_TYPES.NUM.name(), parent);
+        NonTerminalNode num = new NonTerminalNode(NON_TERMINAL_TYPES.NUMBER.name(), parent);
         parent.children.add(num);
 
         Token token = tokens.get(currenTokenIndex);
