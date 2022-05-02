@@ -1,6 +1,7 @@
 package cte_compiler.syntax_analyzer;
 
 import java.util.ArrayList;
+import java.util.Queue;
 
 import cte_compiler.tokenizer.TOKEN_TYPES;
 import cte_compiler.tokenizer.Token;
@@ -161,6 +162,60 @@ public class ParseTreeGenerator {
             TerminalNode tNode = (TerminalNode) node;
             System.out.println(tNode.value + " ");
         }
+    }
+
+    /**
+     * Print Tree
+     * 
+     * prints all nodes in a parse tree.
+     * uses breadth first approach using a stack
+     * 
+     * @param root
+     *             root node to expand on
+     */
+    public void printTree(Node root) {
+        ArrayList<Node> queue = new ArrayList<Node>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+
+            // get first node in queue
+            Node currentNode = queue.remove(0);
+
+            // print node value
+            System.out.println(currentNode.value);
+
+            // add children
+            if (currentNode instanceof NonTerminalNode) {
+                NonTerminalNode ntNode = (NonTerminalNode) currentNode;
+                for (Node n : ntNode.children) {
+                    queue.add(n);
+                }
+            }
+
+        }
+    }
+
+    /**
+     * Count Nodes
+     * 
+     * counts all nodes in tree.
+     * recursively counts each node and its children
+     * 
+     * @param node
+     *             node to count and expand on
+     */
+    public int countNodes(Node node) {
+        int count = 1;
+
+        if (node instanceof NonTerminalNode) {
+            NonTerminalNode ntNode = (NonTerminalNode) node;
+            for (Node n : ntNode.children) {
+                count += countNodes(n);
+            }
+        }
+
+        return count;
     }
 
 }

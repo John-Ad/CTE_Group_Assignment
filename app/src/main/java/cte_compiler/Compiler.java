@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import cte_compiler.syntax_analyzer.NonTerminalNode;
 import cte_compiler.syntax_analyzer.ParseTreeGenerator;
+import cte_compiler.syntax_analyzer.SyntaxTreeGenerator;
 import cte_compiler.tokenizer.TOKEN_TYPES;
 import cte_compiler.tokenizer.Token;
 import cte_compiler.tokenizer.Tokenizer;
@@ -72,8 +73,14 @@ public class Compiler {
 
         ParseTreeGenerator parseTreeGenerator = new ParseTreeGenerator(tokens);
         parseTreeGenerator.generate();
-        NonTerminalNode root = parseTreeGenerator.getTree();
-        parseTreeGenerator.printTerminals(root);
+        NonTerminalNode parseTreeRoot = parseTreeGenerator.getTree();
+        parseTreeGenerator.printTree(parseTreeRoot);
+        System.out.println("Number of nodes: " + parseTreeGenerator.countNodes(parseTreeRoot));
+
+        // ---- STAGE 3: convert parse tree into syntax tree ----
+        SyntaxTreeGenerator syntaxTreeGenerator = new SyntaxTreeGenerator();
+        syntaxTreeGenerator.generate(parseTreeRoot);
+        syntaxTreeGenerator.printInorder(syntaxTreeGenerator.getRoot());
 
         return null;
     }
