@@ -1,7 +1,5 @@
 package cte_compiler.syntax_analyzer;
 
-import java.util.ArrayList;
-
 public class SyntaxTreeGenerator {
     private SyntaxNode root;
 
