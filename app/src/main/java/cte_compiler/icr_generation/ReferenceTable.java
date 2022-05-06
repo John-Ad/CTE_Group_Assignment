@@ -2,6 +2,8 @@ package cte_compiler.icr_generation;
 
 import java.util.Hashtable;
 
+import cte_compiler.grammar_enums.OPERATORS;
+
 public class ReferenceTable {
     private Hashtable<String, ThreeAddressCode> refTable;
     private int refCount;
@@ -11,7 +13,7 @@ public class ReferenceTable {
         refCount = 0;
     }
 
-    public boolean addRef(String refName, String op, TACArg arg1, TACArg arg2) {
+    public boolean addRef(String refName, OPERATORS op, TACArg arg1, TACArg arg2) {
         if (!this.refExists(refName)) {
             refTable.put(refName, new ThreeAddressCode(refName, op, arg1, arg2));
             refCount++;

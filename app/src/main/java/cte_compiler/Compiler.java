@@ -3,6 +3,7 @@ package cte_compiler;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cte_compiler.code_generation.AssemblyGenerator;
 import cte_compiler.icr_generation.IcrGenerator;
 import cte_compiler.syntax_analyzer.NonTerminalNode;
 import cte_compiler.syntax_analyzer.ParseTreeGenerator;
@@ -88,6 +89,11 @@ public class Compiler {
         IcrGenerator icrGenerator = new IcrGenerator();
         icrGenerator.generate(syntaxTreeGenerator.getRoot());
         icrGenerator.printIcr();
+
+        // ---- STAGE 5: convert three address codes to assembly statements ----
+        AssemblyGenerator assemblyGenerator = new AssemblyGenerator();
+        assemblyGenerator.generate(icrGenerator.getReferenceTable(), icrGenerator.getReferenceQueue());
+        assemblyGenerator.printAssemblyStatements();
 
         return null;
     }

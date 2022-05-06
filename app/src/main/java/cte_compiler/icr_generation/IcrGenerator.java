@@ -2,6 +2,7 @@ package cte_compiler.icr_generation;
 
 import java.util.ArrayList;
 
+import cte_compiler.grammar_enums.OPERATORS;
 import cte_compiler.syntax_analyzer.SyntaxNode;
 import cte_compiler.tokenizer.TOKEN_TYPES;
 
@@ -30,18 +31,18 @@ public class IcrGenerator {
 
             // create ref name and add new ref to ref table
             String refName = "t" + Integer.toString(this.referenceTable.getRefCount() + 1);
-            this.referenceTable.addRef(refName, node.value, leftArg, rightArg);
+            this.referenceTable.addRef(refName, OPERATORS.getOperatorType(node.value), leftArg, rightArg);
 
             // add ref to ref stack
             referenceQueue.add(refName);
 
             // return reference name as tac arg e.g t1
-            return new TACArg(refName, TOKEN_TYPES.OPERATOR);
+            return new TACArg(refName, TAC_ARG_TYPES.REFERENCE);
 
         } else { // node is a number
 
             // return number as tac arg e.g 9
-            return new TACArg(node.value, TOKEN_TYPES.NUMBER);
+            return new TACArg(node.value, TAC_ARG_TYPES.CONSTANT);
         }
 
     }

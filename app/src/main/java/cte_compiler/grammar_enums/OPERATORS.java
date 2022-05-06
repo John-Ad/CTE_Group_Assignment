@@ -16,4 +16,18 @@ public enum OPERATORS {
     public String toString() {
         return text;
     }
+
+    public static OPERATORS getOperatorType(String op) {
+        switch (op) {
+            case "+":
+                return PLUS;
+            case "-":
+                return MINUS;
+            case "/":
+                return DIV;
+            case "*":
+                return MULT;
+        }
+        return null;
+    }
 }
