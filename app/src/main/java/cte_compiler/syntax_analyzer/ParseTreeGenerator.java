@@ -7,13 +7,9 @@ import cte_compiler.tokenizer.Token;
  * 
  *          LANGUAGE GRAMMAR:
  * 
- *    expr -> prod + expr | prod - expr | prod
- *    prod -> term * prod | term \ prod | term
- *    term -> number * number | number / number | number
- * 
+ *    expr -> term + expr | term - expr | term
+ *    term -> term * number | term / number | number
  *    
- *    prod -> number * prod | number \ prod | term
- * 
  *    number -> digit{ digit }
  *    digit -> ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7"| "8" | "9" )
  * 
@@ -60,17 +56,15 @@ public class ParseTreeGenerator {
         if (currenTokenIndex >= tokens.size())
             return;
 
-        Token token = tokens.get(currenTokenIndex);
-
         // add prod
-        prod(expr);
+        term(expr, currenTokenIndex + 1);
 
         // return if there are no tokens
         if (currenTokenIndex >= tokens.size())
             return;
 
         // get next token
-        token = tokens.get(currenTokenIndex);
+        Token token = tokens.get(currenTokenIndex);
 
         // if token is minus/plus op, add op terminal and add next expr
         if (token.value.equals("+") || token.value.equals("-")) {
@@ -81,56 +75,37 @@ public class ParseTreeGenerator {
         }
     }
 
-    // ---- PROD NON TERMINAL ----
-    private void prod(NonTerminalNode parent) {
-
-        // add prod non-terminal
-        NonTerminalNode prod = new NonTerminalNode(NON_TERMINAL_TYPES.PRODUCTION.name(), parent);
-        parent.children.add(prod);
-
-        // add term
-        term(prod);
-
-        // check if there are still tokens left
-        if (currenTokenIndex >= tokens.size())
-            return;
-
-        // get next token
-        Token token = tokens.get(currenTokenIndex);
-
-        // if token is mult/div op, add op terminal and add next term
-        if (token.value.equals("*") || token.value.equals("/")) {
-            prod.children.add(new TerminalNode(token.value, prod, token));
-            currenTokenIndex++;
-
-            prod(prod);
-        }
-    }
-
     // ---- TERM NON TERMINAL ----
-    private void term(NonTerminalNode parent) {
+    private void term(NonTerminalNode parent, int lookAhead) {
 
         // add term non-terminal
         NonTerminalNode term = new NonTerminalNode(NON_TERMINAL_TYPES.TERM.name(), parent);
         parent.children.add(term);
 
-        // add number
+        // check if lookAhead is in bounds
+        if (lookAhead < tokens.size()) {
+
+            // get token at lookAhead
+            Token lookAheadOp = tokens.get(lookAhead);
+
+            /**
+             * if op is * or /,
+             * add term then op
+             **/
+            if (lookAheadOp.value.equals("*") || lookAheadOp.value.equals("/")) {
+
+                term(term, lookAhead + 2); // look ahead + 2 to skip over next digit
+
+                // add op
+                Token token = tokens.get(currenTokenIndex);
+                term.children.add(new TerminalNode(token.value, term, token));
+                currenTokenIndex++;
+            }
+        }
+
+        // add number, a number will always be added to term
         number(term);
 
-        // check if there are still tokens left
-        if (currenTokenIndex >= tokens.size())
-            return;
-
-        // get next token
-        Token token = tokens.get(currenTokenIndex);
-
-        // if token is mult/div op, add op terminal and add next number
-        if (token.value.equals("*") || token.value.equals("/")) {
-            term.children.add(new TerminalNode(token.value, term, token));
-            currenTokenIndex++;
-
-            number(term);
-        }
     }
 
     // ---- NUMBER TERMINAL ----
