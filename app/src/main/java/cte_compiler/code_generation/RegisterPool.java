@@ -15,9 +15,14 @@ public class RegisterPool {
         this.freeStack = new ArrayList<String>();
 
         // add general purpose registers
-        this.freeStack.add("ebx");
-        this.freeStack.add("ecx");
-        this.freeStack.add("edx");
+        this.freeStack.add("r8d");
+        this.freeStack.add("r9d");
+        this.freeStack.add("r10d");
+        this.freeStack.add("r11d");
+        this.freeStack.add("r12d");
+        this.freeStack.add("r13d");
+        this.freeStack.add("r14d");
+        this.freeStack.add("r15d");
     }
 
     public String getRegister() {

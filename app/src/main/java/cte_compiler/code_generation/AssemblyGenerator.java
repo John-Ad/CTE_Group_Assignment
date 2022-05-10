@@ -110,8 +110,6 @@ public class AssemblyGenerator {
                 // map ref to register
                 refToRegMap.put(refName, register);
 
-                // continue to next iter
-                continue;
             } else {
                 /*
                  * if arg1 is a constant, a MOV operation is needed
@@ -158,7 +156,7 @@ public class AssemblyGenerator {
                  * 
                  * e.g t1 = 4 + 5 -> mov eax, 4
                  * ----------------- add eax, 5
-                 * or t3 = t1 / 10 -> div eax, 10 // no mov op needed
+                 * or t3 = t1 + 5 -> add eax, 5 // no mov op needed
                  */
                 if (arg1.type == TAC_ARG_TYPES.REFERENCE) {
 
@@ -184,18 +182,19 @@ public class AssemblyGenerator {
                     refToRegMap.put(refName, register);
                 }
 
-                /**
-                 * Free registers that are not needed anymore.
-                 * 
-                 * Only registers that are form the second arg in a
-                 * statement can be freed, since the register for the
-                 * first arg is reused
-                 */
-                if (arg2.type == TAC_ARG_TYPES.REFERENCE) {
-                    if (refToRegMap.contains(arg2.value)) {
-                        String regToFree = this.refToRegMap.remove(arg2.value);
-                        registerPool.freeRegister(regToFree);
-                    }
+            }
+
+            /**
+             * Free registers that are not needed anymore.
+             * 
+             * Only registers that are form the second arg in a
+             * statement can be freed, since the register for the
+             * first arg is reused
+             */
+            if (arg2.type == TAC_ARG_TYPES.REFERENCE) {
+                if (refToRegMap.contains(arg2.value)) {
+                    String regToFree = this.refToRegMap.remove(arg2.value);
+                    registerPool.freeRegister(regToFree);
                 }
             }
 
