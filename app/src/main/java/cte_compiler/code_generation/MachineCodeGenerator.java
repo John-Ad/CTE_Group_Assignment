@@ -21,11 +21,13 @@ public class MachineCodeGenerator {
         this.divOpcodeMappings = new HashMap<String, String>();
         this.mulOpcodeMappings = new HashMap<String, String>();
 
-        // ---- mov opcode mappings ----
+        // ------------------------------
+        // MOV OPCODE MAPPINGS
+        // ------------------------------
 
         // move const to eax or eab
-        this.movOpcodeMappings.put("eax", "10111000"); // for div
-        this.movOpcodeMappings.put("ebx", "10111011"); // for div
+        this.movOpcodeMappings.put("eax", "10111000"); // for div and mul
+        this.movOpcodeMappings.put("ebx", "10111011"); // for div and mul
 
         // move const to any r
         this.movOpcodeMappings.put("r8d", "11000001 101110000");
@@ -57,7 +59,9 @@ public class MachineCodeGenerator {
         this.movOpcodeMappings.put("r14deax", "1000001 10001001 11000110");
         this.movOpcodeMappings.put("r15deax", "1000001 10001001 11000111");
 
-        // ---- add opcode mappings ----
+        // ------------------------------
+        // ADD OPCODE MAPPINGS
+        // ------------------------------
 
         // add const to r
         this.addOpcodeMappings.put("r8d", "1001001 10000011 11000000");
@@ -150,14 +154,26 @@ public class MachineCodeGenerator {
         this.addOpcodeMappings.put("r14dr15d", "1000101 1 11111110");
         this.addOpcodeMappings.put("r15dr15d", "1000101 1 11111111");
 
-        // ---- sub opcode mappings ----
+        // ------------------------------
+        // SUB OPCODE MAPPINGS
+        // ------------------------------
 
         this.subOpcodeMappings.put("eax", "10000011 11000010");
         this.subOpcodeMappings.put("ebx", "10000011 11000011");
         this.subOpcodeMappings.put("ecx", "10000011 11000001");
         this.subOpcodeMappings.put("edx", "10000011 11000010");
 
-        // sub r8 to any r
+        // sub const from r
+        this.subOpcodeMappings.put("r8d", "1000001 10000011 11101000");
+        this.subOpcodeMappings.put("r9d", "1000001 10000011 11101001");
+        this.subOpcodeMappings.put("r10d", "1000001 10000011 11101010");
+        this.subOpcodeMappings.put("r11d", "1000001 10000011 11101011");
+        this.subOpcodeMappings.put("r12d", "1000001 10000011 11101100");
+        this.subOpcodeMappings.put("r13d", "1000001 10000011 11101101");
+        this.subOpcodeMappings.put("r14d", "1000001 10000011 11101110");
+        this.subOpcodeMappings.put("r15d", "1000001 10000011 11101111");
+
+        // sub r8 from any r
         this.subOpcodeMappings.put("r8dr8d", "11000101 101001 110000000");
         this.subOpcodeMappings.put("r9dr8d", "11000101 101001 110000011");
         this.subOpcodeMappings.put("r10dr8d", "11000101 101001 110000100");
@@ -167,7 +183,7 @@ public class MachineCodeGenerator {
         this.subOpcodeMappings.put("r14dr8d", "11000101 101001 110001100");
         this.subOpcodeMappings.put("r15dr8d", "11000101 101001 110001111");
 
-        // sub r9 to any r
+        // sub r9 from any r
         this.subOpcodeMappings.put("r8dr9d", "11000101 101001 110010000");
         this.subOpcodeMappings.put("r9dr9d", "11000101 101001 110010011");
         this.subOpcodeMappings.put("r10dr9d", "11000101 101001 110010100");
@@ -177,7 +193,7 @@ public class MachineCodeGenerator {
         this.subOpcodeMappings.put("r14dr9d", "11000101 101001 110011100");
         this.subOpcodeMappings.put("r15dr9d", "11000101 101001 110011111");
 
-        // sub r10 to any r
+        // sub r10 from any r
         this.subOpcodeMappings.put("r8dr10d", "1000101 101001 11010000");
         this.subOpcodeMappings.put("r9dr10d", "1000101 101001 11010001");
         this.subOpcodeMappings.put("r10dr10d", "1000101 101001 11010010");
@@ -187,7 +203,7 @@ public class MachineCodeGenerator {
         this.subOpcodeMappings.put("r14dr10d", "1000101 101001 11010110");
         this.subOpcodeMappings.put("r15dr10d", "1000101 101001 11010111");
 
-        // sub r11 to any r
+        // sub r11 from any r
         this.subOpcodeMappings.put("r8dr11d", "11000101 101001 110110000");
         this.subOpcodeMappings.put("r9dr11d", "11000101 101001 110110011");
         this.subOpcodeMappings.put("r10dr11d", "11000101 101001 110110100");
@@ -197,7 +213,7 @@ public class MachineCodeGenerator {
         this.subOpcodeMappings.put("r14dr11d", "11000101 101001 110111100");
         this.subOpcodeMappings.put("r15dr11d", "11000101 101001 110111111");
 
-        // sub r12 to any r
+        // sub r12 from any r
         this.subOpcodeMappings.put("r8dr12d", "1000101 101001 11100000");
         this.subOpcodeMappings.put("r9dr12d", "1000101 101001 11100001");
         this.subOpcodeMappings.put("r10dr12d", "1000101 101001 11100010");
@@ -207,7 +223,7 @@ public class MachineCodeGenerator {
         this.subOpcodeMappings.put("r14dr12d", "1000101 101001 11100110");
         this.subOpcodeMappings.put("r15dr12d", "1000101 101001 11100111");
 
-        // sub r13 to any r
+        // sub r13 from any r
         this.subOpcodeMappings.put("r8dr13d", "1000101 101001 11101000");
         this.subOpcodeMappings.put("r9dr13d", "1000101 101001 11101001");
         this.subOpcodeMappings.put("r10dr13d", "1000101 101001 11101010");
@@ -217,7 +233,7 @@ public class MachineCodeGenerator {
         this.subOpcodeMappings.put("r14dr13d", "1000101 101001 11101110");
         this.subOpcodeMappings.put("r15dr13d", "1000101 101001 11101111");
 
-        // sub r14 to any r
+        // sub r14 from any r
         this.subOpcodeMappings.put("r8dr14d", "1000101 101001 11110000");
         this.subOpcodeMappings.put("r9dr14d", "1000101 101001 11110001");
         this.subOpcodeMappings.put("r10dr14d", "1000101 101001 11110010");
@@ -227,7 +243,7 @@ public class MachineCodeGenerator {
         this.subOpcodeMappings.put("r14dr14d", "1000101 101001 11110110");
         this.subOpcodeMappings.put("r15dr14d", "1000101 101001 11110111");
 
-        // sub r15 to any r
+        // sub r15 from any r
         this.subOpcodeMappings.put("r8dr15d", "1000101 101001 11111000");
         this.subOpcodeMappings.put("r9dr15d", "1000101 101001 11111001");
         this.subOpcodeMappings.put("r10dr15d", "1000101 101001 11111010");
@@ -237,10 +253,14 @@ public class MachineCodeGenerator {
         this.subOpcodeMappings.put("r14dr15d", "1000101 101001 11111110");
         this.subOpcodeMappings.put("r15dr15d", "1000101 101001 11111111");
 
-        // ---- div opcode mappings ----
+        // ------------------------------
+        // DIV OPCODE MAPPINGS
+        // ------------------------------
         this.divOpcodeMappings.put("div", "11110111 11110011"); // div eax by ebx
 
-        // ---- mul opcode mappings ----
+        // ------------------------------
+        // MUL OPCODE MAPPINGS
+        // ------------------------------
         this.mulOpcodeMappings.put("imul", "1101011 11000000"); // multiply eax by constant and store in eax
                                                                 // this prevents the need to first move const to ebx and
                                                                 // then mul
@@ -354,7 +374,7 @@ public class MachineCodeGenerator {
             // --- SUB OP ---
             if (astmt.instruction == ASSEMBLY_KEYWORDS.SUB) {
 
-                // IF SUBTRACTION CONST FROM REGISTER
+                // IF SUBTRACTING CONST FROM REGISTER
                 if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER && astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
 
                     // add start of add op code
