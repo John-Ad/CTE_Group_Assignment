@@ -42,8 +42,8 @@ public class Compiler {
         this.operators.put("+", TOKEN_TYPES.OPERATOR.name());
 
         // ---- initialize symbols map ----
-        this.symbols.put("=", TOKEN_TYPES.SYMBOL.name());
-        this.symbols.put(";", TOKEN_TYPES.SYMBOL.name());
+        // this.symbols.put("=", TOKEN_TYPES.SYMBOL.name());
+        // this.symbols.put(";", TOKEN_TYPES.SYMBOL.name());
     }
 
     // -------------------------------------------------------------------------------
@@ -63,12 +63,18 @@ public class Compiler {
 
         Tokenizer tokenizer = new Tokenizer(this.operators, this.symbols);
         tokenizer.readInput("Enter statement: "); // use DONE as value to end input
-        System.out.println(tokenizer.getUserInput());
 
-        tokenizer.createTokens();
-        ArrayList<Token> tokens = tokenizer.getTokens();
-        for (Token t : tokens) {
-            System.out.println(t.type + ": " + t.value);
+        ArrayList<Token> tokens = null;
+
+        if (tokenizer.createTokens()) {
+            System.out.println("Successfully created tokens!");
+            tokens = tokenizer.getTokens();
+            for (Token t : tokens) {
+                System.out.println(t.type + ": " + t.value);
+            }
+        } else {
+            System.out.println(
+                    "Failed to create tokens! Invalid character found in string: " + tokenizer.getErrorMessage());
         }
 
         // ---- STAGE 2: convert tokens into parse tree ----

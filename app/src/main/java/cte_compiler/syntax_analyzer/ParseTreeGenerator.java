@@ -18,12 +18,14 @@ import cte_compiler.tokenizer.Token;
 public class ParseTreeGenerator {
     private NonTerminalNode treeRoot;
     private ArrayList<Token> tokens;
+    private ArrayList<String> errorMessages;
 
     private int currenTokenIndex; // tracks current token
 
     // ---- CONSTRUCTOR ----
     public ParseTreeGenerator(ArrayList<Token> tokens) {
         this.treeRoot = new NonTerminalNode(NON_TERMINAL_TYPES.PROGRAM.name(), null);
+        this.errorMessages = new ArrayList<String>();
 
         this.tokens = tokens;
         this.currenTokenIndex = 0;
@@ -41,8 +43,20 @@ public class ParseTreeGenerator {
             return;
         }
 
-        // check expression
+        // add expression
         expression(this.treeRoot);
+
+        // check if last token is ;
+        if (currenTokenIndex >= tokens.size()) {
+            this.errorMessages
+                    .add("Syntax error: ; expected at end of string after: " + tokens.get(tokens.size() - 1).value);
+            return;
+        }
+
+        if (tokens.get(currenTokenIndex).value != ";")
+            this.errorMessages
+                    .add("Syntax error: ; expected at end of string after: " + tokens.get(tokens.size() - 2).value);
+
     }
 
     // ---- EXPRESSION NON TERMINAL ----

@@ -21,6 +21,7 @@ public class Tokenizer {
     private String userInput; // stores input read
     private int currentIndex; // keeps track of current position in input string
     private int currentLineNumber = 1; // tracks current line number
+    private String errorMessage;
 
     private ArrayList<Token> tokens;
 
@@ -42,6 +43,8 @@ public class Tokenizer {
         // set maps to values passed in
         this.operators = operators;
         this.symbols = symbols;
+
+        this.errorMessage = "";
     }
 
     /**
@@ -54,7 +57,7 @@ public class Tokenizer {
      * @
      * -------------------------------------------------
      */
-    public void createTokens() {
+    public boolean createTokens() {
 
         // loop until end of input
         while (true) {
@@ -73,6 +76,10 @@ public class Tokenizer {
                 break;
             }
 
+            if (checkForInvalidChar()) {
+                return false;
+            }
+
             // check for symbol
             if (this.symbols.containsKey(Character.toString(userInput.charAt(currentIndex)))) {
                 tokens.add(new Token(TOKEN_TYPES.SYMBOL,
@@ -88,6 +95,9 @@ public class Tokenizer {
             // move to next char
             currentIndex++;
         }
+
+        // tokens successfully created
+        return true;
     }
 
     // ---------------------------------------
@@ -126,6 +136,33 @@ public class Tokenizer {
         if (userInput.charAt(currentIndex) == '\n') {
             currentLineNumber++;
         }
+    }
+
+    /**
+     * ------------------------------------------------
+     * CHECK FOR INVALID CHAR
+     * 
+     * checks for invalid characters and
+     * returns true if found
+     * ------------------------------------------------
+     */
+    private boolean checkForInvalidChar() {
+
+        char c = userInput.charAt(currentIndex);
+
+        if (Character.isAlphabetic(c)) {
+            this.errorMessage = Character.toString(c);
+            return true;
+        }
+
+        // not number, symbol, operator or ;
+        if (!Character.isDigit(c) && !operators.containsKey(Character.toString(c))
+                && !operators.containsKey(Character.toString(c)) && c != ';') {
+            this.errorMessage = Character.toString(c);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -207,6 +244,17 @@ public class Tokenizer {
      */
     public ArrayList<Token> getTokens() {
         return this.tokens;
+    }
+
+    /**
+     * ------------------------------------------------
+     * GET ERROR MESSAGE
+     * 
+     * returns error message
+     * ------------------------------------------------
+     */
+    public String getErrorMessage() {
+        return this.errorMessage;
     }
 
     /**
