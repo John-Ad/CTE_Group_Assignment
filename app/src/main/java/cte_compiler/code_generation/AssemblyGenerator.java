@@ -231,6 +231,10 @@ public class AssemblyGenerator {
         }
     }
 
+    public ArrayList<AssemblyStatement> getAssemblyStatements() {
+        return this.assemblyStatementQueue;
+    }
+
     public void printAssemblyStatements() {
         for (AssemblyStatement statement : this.assemblyStatementQueue) {
 

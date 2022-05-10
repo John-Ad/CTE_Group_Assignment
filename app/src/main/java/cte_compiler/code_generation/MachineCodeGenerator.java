@@ -248,6 +248,11 @@ public class MachineCodeGenerator {
 
     public boolean generateMachineCode(ArrayList<AssemblyStatement> assemblyStatements) {
 
+        // return false if there are no assembly statements
+        if (assemblyStatements.size() == 0) {
+            return false;
+        }
+
         // loop through assembly statements
         for (AssemblyStatement astmt : assemblyStatements) {
 
@@ -257,7 +262,7 @@ public class MachineCodeGenerator {
             if (astmt.instruction == ASSEMBLY_KEYWORDS.MOV) {
 
                 // IF MOVING CONST TO REGISTER
-                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER && astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
 
                     // add start of mov op code
                     machineCode += movOpcodeMappings.get(astmt.arg1.value.toLowerCase());
@@ -275,7 +280,7 @@ public class MachineCodeGenerator {
                 }
 
                 // IF MOVING REGISTER TO REGISTER
-                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER && astmt.arg2.type == ASSEMBLY_ARG_TYPES.REGISTER) {
 
                     String regCombo = astmt.arg1.value.toLowerCase() + astmt.arg2.value.toLowerCase();
 
@@ -299,7 +304,7 @@ public class MachineCodeGenerator {
             if (astmt.instruction == ASSEMBLY_KEYWORDS.MUL) {
 
                 // add start of code
-                machineCode += divOpcodeMappings.get("imul");
+                machineCode += mulOpcodeMappings.get("imul");
 
                 // get binary of arg2
                 Integer arg2Val = Integer.parseInt(astmt.arg2.value);
@@ -316,7 +321,7 @@ public class MachineCodeGenerator {
             if (astmt.instruction == ASSEMBLY_KEYWORDS.ADD) {
 
                 // IF ADDING CONST TO REGISTER
-                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER && astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
 
                     // add start of add op code
                     machineCode += addOpcodeMappings.get(astmt.arg1.value.toLowerCase());
@@ -334,7 +339,7 @@ public class MachineCodeGenerator {
                 }
 
                 // IF ADDING REGISTER TO REGISTER
-                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER && astmt.arg2.type == ASSEMBLY_ARG_TYPES.REGISTER) {
 
                     String regCombo = astmt.arg1.value.toLowerCase() + astmt.arg2.value.toLowerCase();
 
@@ -350,7 +355,7 @@ public class MachineCodeGenerator {
             if (astmt.instruction == ASSEMBLY_KEYWORDS.SUB) {
 
                 // IF SUBTRACTION CONST FROM REGISTER
-                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER && astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
 
                     // add start of add op code
                     machineCode += subOpcodeMappings.get(astmt.arg1.value.toLowerCase());
@@ -368,7 +373,7 @@ public class MachineCodeGenerator {
                 }
 
                 // IF SUBTRACTING REGISTER FROM REGISTER
-                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER && astmt.arg2.type == ASSEMBLY_ARG_TYPES.REGISTER) {
 
                     String regCombo = astmt.arg1.value.toLowerCase() + astmt.arg2.value.toLowerCase();
 
@@ -381,6 +386,12 @@ public class MachineCodeGenerator {
             }
         }
 
-        return false;
+        return true;
+    }
+
+    public void printMachineCode() {
+        for (String str : machineStatements) {
+            System.out.println(str);
+        }
     }
 }

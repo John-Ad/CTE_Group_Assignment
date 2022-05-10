@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import cte_compiler.code_generation.AssemblyGenerator;
+import cte_compiler.code_generation.MachineCodeGenerator;
 import cte_compiler.icr_generation.IcrGenerator;
 import cte_compiler.syntax_analyzer.NonTerminalNode;
 import cte_compiler.syntax_analyzer.ParseTreeGenerator;
@@ -97,9 +98,21 @@ public class Compiler {
         icrGenerator.printIcr();
 
         // ---- STAGE 5: convert three address codes to assembly statements ----
+        System.out.println("\n Stage 5 --> assembly code generation");
         AssemblyGenerator assemblyGenerator = new AssemblyGenerator();
         assemblyGenerator.generate(icrGenerator.getReferenceTable(), icrGenerator.getReferenceQueue());
         assemblyGenerator.printAssemblyStatements();
+
+        // ---- STAGE 6: optimise assembly code ----
+        // TO BE IMPLEMENTED
+
+        // ---- STAGE 7: convert assembly into machine code ----
+        System.out.println("\n Stage 7 --> machine code generation");
+        MachineCodeGenerator machineCodeGenerator = new MachineCodeGenerator();
+        boolean mcGenerated = machineCodeGenerator.generateMachineCode(assemblyGenerator.getAssemblyStatements());
+        if (mcGenerated) {
+            machineCodeGenerator.printMachineCode();
+        }
 
         return null;
     }
