@@ -4,7 +4,7 @@ import cte_compiler.grammar_enums.OPERATORS;
 
 public enum ASSEMBLY_KEYWORDS {
     MOV("MOV"),
-    MUL("MUL"),
+    MUL("IMUL"),
     DIV("DIV"),
     ADD("ADD"),
     SUB("SUB");

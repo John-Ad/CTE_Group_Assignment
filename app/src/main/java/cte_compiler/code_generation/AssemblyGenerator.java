@@ -91,21 +91,51 @@ public class AssemblyGenerator {
                         new AssemblyArg("eax", ASSEMBLY_ARG_TYPES.REGISTER),
                         new AssemblyArg(arg1Val, arg1Type));
 
-                // perform mul or div
-                AssemblyStatement st2 = new AssemblyStatement(ASSEMBLY_KEYWORDS.getKeywordForOp(op),
-                        new AssemblyArg(arg2Val, arg2Type),
-                        null);
+                // if DIV
+                if (op == OPERATORS.DIV) {
 
-                // store in new or old register
-                AssemblyStatement st3 = new AssemblyStatement(ASSEMBLY_KEYWORDS.MOV,
-                        new AssemblyArg(register, ASSEMBLY_ARG_TYPES.REGISTER),
-                        new AssemblyArg("eax", ASSEMBLY_ARG_TYPES.REGISTER));
+                    // move second arg to ebx
+                    AssemblyStatement st2 = new AssemblyStatement(ASSEMBLY_KEYWORDS.MOV,
+                            new AssemblyArg("ebx", ASSEMBLY_ARG_TYPES.REGISTER),
+                            new AssemblyArg(arg2Val, arg2Type));
+
+                    // perform div using ebx
+                    AssemblyStatement st3 = new AssemblyStatement(ASSEMBLY_KEYWORDS.DIV,
+                            new AssemblyArg("ebx", ASSEMBLY_ARG_TYPES.REGISTER),
+                            null);
+
+                    // store in new or old register
+                    AssemblyStatement st4 = new AssemblyStatement(ASSEMBLY_KEYWORDS.MOV,
+                            new AssemblyArg(register, ASSEMBLY_ARG_TYPES.REGISTER),
+                            new AssemblyArg("eax", ASSEMBLY_ARG_TYPES.REGISTER));
+
+                    // add statements
+                    this.assemblyStatementQueue.add(st1);
+                    this.assemblyStatementQueue.add(st2);
+                    this.assemblyStatementQueue.add(st3);
+                    this.assemblyStatementQueue.add(st4);
+                }
+
+                // if MUL
+                if (op == OPERATORS.MULT) {
+
+                    // perform imul using eax
+                    AssemblyStatement st2 = new AssemblyStatement(ASSEMBLY_KEYWORDS.MUL,
+                            new AssemblyArg("eax", ASSEMBLY_ARG_TYPES.REGISTER),
+                            new AssemblyArg(arg2Val, arg2Type));
+
+                    // store in new or old register
+                    AssemblyStatement st3 = new AssemblyStatement(ASSEMBLY_KEYWORDS.MOV,
+                            new AssemblyArg(register, ASSEMBLY_ARG_TYPES.REGISTER),
+                            new AssemblyArg("eax", ASSEMBLY_ARG_TYPES.REGISTER));
+
+                    // add statements
+                    this.assemblyStatementQueue.add(st1);
+                    this.assemblyStatementQueue.add(st2);
+                    this.assemblyStatementQueue.add(st3);
+                }
 
                 // add statements
-
-                this.assemblyStatementQueue.add(st1);
-                this.assemblyStatementQueue.add(st2);
-                this.assemblyStatementQueue.add(st3);
 
                 // map ref to register
                 refToRegMap.put(refName, register);

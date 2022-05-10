@@ -1,8 +1,11 @@
 package cte_compiler.code_generation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MachineCodeGenerator {
+    private ArrayList<String> machineStatements;
+
     private HashMap<String, String> movOpcodeMappings;
     private HashMap<String, String> addOpcodeMappings;
     private HashMap<String, String> subOpcodeMappings;
@@ -10,6 +13,8 @@ public class MachineCodeGenerator {
     private HashMap<String, String> mulOpcodeMappings;
 
     public MachineCodeGenerator() {
+        this.machineStatements = new ArrayList<String>();
+
         this.movOpcodeMappings = new HashMap<String, String>();
         this.addOpcodeMappings = new HashMap<String, String>();
         this.subOpcodeMappings = new HashMap<String, String>();
@@ -17,8 +22,22 @@ public class MachineCodeGenerator {
         this.mulOpcodeMappings = new HashMap<String, String>();
 
         // ---- mov opcode mappings ----
+
+        // move const to eax or eab
         this.movOpcodeMappings.put("eax", "10111000"); // for div
         this.movOpcodeMappings.put("ebx", "10111011"); // for div
+
+        // move const to any r
+        this.movOpcodeMappings.put("r8d", "11000001 101110000");
+        this.movOpcodeMappings.put("r9d", "11000001 101110010");
+        this.movOpcodeMappings.put("r10d", "11000001 101110100");
+        this.movOpcodeMappings.put("r11d", "11000001 101110110");
+        this.movOpcodeMappings.put("r12d", "11000001 101111000");
+        this.movOpcodeMappings.put("r13d", "11000001 101111010");
+        this.movOpcodeMappings.put("r14d", "11000001 101111100");
+        this.movOpcodeMappings.put("r15d", "11000001 101111110");
+
+        // move any r to eax
         this.movOpcodeMappings.put("eaxr8d", "1000100 10001001 11000000");
         this.movOpcodeMappings.put("eaxr9d", "1000100 10001001 11001000");
         this.movOpcodeMappings.put("eaxr10d", "1000100 10001001 11010000");
@@ -28,6 +47,7 @@ public class MachineCodeGenerator {
         this.movOpcodeMappings.put("eaxr14d", "1000100 10001001 11110000");
         this.movOpcodeMappings.put("eaxr15d", "1000100 10001001 11111000");
 
+        // move eax to any r
         this.movOpcodeMappings.put("r8deax", "1000001 10001001 11000000");
         this.movOpcodeMappings.put("r9deax", "1000001 10001001 11000001");
         this.movOpcodeMappings.put("r10deax", "1000001 10001001 11000010");
@@ -221,6 +241,146 @@ public class MachineCodeGenerator {
         this.divOpcodeMappings.put("div", "11110111 11110011"); // div eax by ebx
 
         // ---- mul opcode mappings ----
-        this.mulOpcodeMappings.put("imul", "1101011 11000000"); // multiply eax and store in eax
+        this.mulOpcodeMappings.put("imul", "1101011 11000000"); // multiply eax by constant and store in eax
+                                                                // this prevents the need to first move const to ebx and
+                                                                // then mul
+    }
+
+    public boolean generateMachineCode(ArrayList<AssemblyStatement> assemblyStatements) {
+
+        // loop through assembly statements
+        for (AssemblyStatement astmt : assemblyStatements) {
+
+            String machineCode = "";
+
+            // --- MOV OP ---
+            if (astmt.instruction == ASSEMBLY_KEYWORDS.MOV) {
+
+                // IF MOVING CONST TO REGISTER
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+
+                    // add start of mov op code
+                    machineCode += movOpcodeMappings.get(astmt.arg1.value.toLowerCase());
+
+                    // get binary of arg2
+                    Integer arg2Val = Integer.parseInt(astmt.arg2.value);
+                    String binary = Integer.toBinaryString(arg2Val);
+
+                    // add constant value
+                    machineCode += " " + binary;
+
+                    // add to statements
+                    this.machineStatements.add(machineCode);
+
+                }
+
+                // IF MOVING REGISTER TO REGISTER
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+
+                    String regCombo = astmt.arg1.value.toLowerCase() + astmt.arg2.value.toLowerCase();
+
+                    // op code using combo of the 2 registers
+                    machineCode += movOpcodeMappings.get(regCombo);
+
+                    // add to statements
+                    this.machineStatements.add(machineCode);
+                }
+            }
+
+            // --- DIV OP ---
+            if (astmt.instruction == ASSEMBLY_KEYWORDS.DIV) {
+                machineCode += divOpcodeMappings.get("div"); // div will always use ebx so no need for extra mappings
+
+                // add to statements
+                this.machineStatements.add(machineCode);
+            }
+
+            // --- MUL OP ---
+            if (astmt.instruction == ASSEMBLY_KEYWORDS.MUL) {
+
+                // add start of code
+                machineCode += divOpcodeMappings.get("imul");
+
+                // get binary of arg2
+                Integer arg2Val = Integer.parseInt(astmt.arg2.value);
+                String binary = Integer.toBinaryString(arg2Val);
+
+                // add constant
+                machineCode += " " + binary;
+
+                // add to statements
+                this.machineStatements.add(machineCode);
+            }
+
+            // --- ADD OP ---
+            if (astmt.instruction == ASSEMBLY_KEYWORDS.ADD) {
+
+                // IF ADDING CONST TO REGISTER
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+
+                    // add start of add op code
+                    machineCode += addOpcodeMappings.get(astmt.arg1.value.toLowerCase());
+
+                    // get binary of arg2
+                    Integer arg2Val = Integer.parseInt(astmt.arg2.value);
+                    String binary = Integer.toBinaryString(arg2Val);
+
+                    // add constant value
+                    machineCode += " " + binary;
+
+                    // add to statements
+                    this.machineStatements.add(machineCode);
+
+                }
+
+                // IF ADDING REGISTER TO REGISTER
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+
+                    String regCombo = astmt.arg1.value.toLowerCase() + astmt.arg2.value.toLowerCase();
+
+                    // op code using combo of the 2 registers
+                    machineCode += addOpcodeMappings.get(regCombo);
+
+                    // add to statements
+                    this.machineStatements.add(machineCode);
+                }
+            }
+
+            // --- SUB OP ---
+            if (astmt.instruction == ASSEMBLY_KEYWORDS.SUB) {
+
+                // IF SUBTRACTION CONST FROM REGISTER
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+
+                    // add start of add op code
+                    machineCode += subOpcodeMappings.get(astmt.arg1.value.toLowerCase());
+
+                    // get binary of arg2
+                    Integer arg2Val = Integer.parseInt(astmt.arg2.value);
+                    String binary = Integer.toBinaryString(arg2Val);
+
+                    // add constant value
+                    machineCode += " " + binary;
+
+                    // add to statements
+                    this.machineStatements.add(machineCode);
+
+                }
+
+                // IF SUBTRACTING REGISTER FROM REGISTER
+                if (astmt.arg1.type == ASSEMBLY_ARG_TYPES.REGISTER || astmt.arg2.type == ASSEMBLY_ARG_TYPES.CONSTANT) {
+
+                    String regCombo = astmt.arg1.value.toLowerCase() + astmt.arg2.value.toLowerCase();
+
+                    // op code using combo of the 2 registers
+                    machineCode += subOpcodeMappings.get(regCombo);
+
+                    // add to statements
+                    this.machineStatements.add(machineCode);
+                }
+            }
+        }
+
+        return false;
     }
 }
