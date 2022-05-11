@@ -151,6 +151,7 @@ public class AssemblyGenerator {
     }
 
     public void printAssemblyStatements() {
+        System.out.println("======" + "STAGE5: CODE GENERATION");
         for (AssemblyStatement statement : this.assemblyStatementQueue) {
             System.out.println(
                     statement.instruction.toString() + " " + statement.arg1.value + ", " + statement.arg2.value);

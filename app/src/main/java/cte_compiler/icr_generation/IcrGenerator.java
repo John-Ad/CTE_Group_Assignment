@@ -56,12 +56,14 @@ public class IcrGenerator {
     }
 
     public void printIcr() {
+        System.out.println("======STAGE4: COMPILER TECHNIQUES--> INTERMEDIATE CODE REPRESENTATION (ICR)");
         for (String refName : referenceQueue) {
             ThreeAddressCode tac = this.referenceTable.getRef(refName);
             if (tac != null) {
                 System.out.println(tac.toString());
             }
         }
+        System.out.println("CONCLUSION-->The expression was correctly generated in ICR");
     }
 
-}
+    }
