@@ -53,9 +53,10 @@ public class ParseTreeGenerator {
             return;
         }
 
-        if (tokens.get(currenTokenIndex).value != ";")
+        if (!tokens.get(currenTokenIndex).value.equals(";")) {
             this.errorMessages
                     .add("Syntax error: ; expected at end of string after: " + tokens.get(tokens.size() - 2).value);
+        }
 
     }
 
@@ -212,27 +213,14 @@ public class ParseTreeGenerator {
         return count;
     }
 
+    public ArrayList<String> getErrorMessages() {
+        return this.errorMessages;
+    }
+
+    public void printErrorMessages() {
+        System.out.println("Parsing errors: ");
+        for (String err : this.errorMessages) {
+            System.out.println(err);
+        }
+    }
 }
-
-// public void printTree(Node root) {
-// ArrayList<Node> queue = new ArrayList<Node>();
-// queue.add(root);
-
-// while (!queue.isEmpty()) {
-
-// // get first node in queue
-// Node currentNode = queue.remove(0);
-
-// // print node value
-// System.out.println(currentNode.value);
-
-// // add children
-// if (currentNode instanceof NonTerminalNode) {
-// NonTerminalNode ntNode = (NonTerminalNode) currentNode;
-// for (Node n : ntNode.children) {
-// queue.add(n);
-// }
-// }
-
-// }
-// }

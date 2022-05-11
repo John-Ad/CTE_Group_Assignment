@@ -21,7 +21,8 @@ public class Tokenizer {
     private String userInput; // stores input read
     private int currentIndex; // keeps track of current position in input string
     private int currentLineNumber = 1; // tracks current line number
-    private String errorMessage;
+    private ArrayList<String> errorMessages;
+    private boolean isValid;
 
     private ArrayList<Token> tokens;
 
@@ -44,7 +45,8 @@ public class Tokenizer {
         this.operators = operators;
         this.symbols = symbols;
 
-        this.errorMessage = "";
+        this.errorMessages = new ArrayList<String>();
+        this.isValid = true;
     }
 
     /**
@@ -76,9 +78,8 @@ public class Tokenizer {
                 break;
             }
 
-            if (checkForInvalidChar()) {
-                return false;
-            }
+            // check for invalid characters
+            checkForInvalidChar();
 
             // check for symbol
             if (this.symbols.containsKey(Character.toString(userInput.charAt(currentIndex)))) {
@@ -96,8 +97,17 @@ public class Tokenizer {
             currentIndex++;
         }
 
-        // tokens successfully created
-        return true;
+        if (this.userInput.length() == 0) {
+            this.errorMessages.add("no user input!");
+            return false;
+        }
+        if (this.userInput.charAt(userInput.length() - 1) != ';') {
+            this.errorMessages.add("semi-colon expected at end of string!");
+            return false;
+        }
+
+        // false = failure, true = success
+        return this.isValid;
     }
 
     // ---------------------------------------
@@ -146,23 +156,47 @@ public class Tokenizer {
      * returns true if found
      * ------------------------------------------------
      */
-    private boolean checkForInvalidChar() {
+    private void checkForInvalidChar() {
 
         char c = userInput.charAt(currentIndex);
 
         if (Character.isAlphabetic(c)) {
-            this.errorMessage = Character.toString(c);
-            return true;
+            this.errorMessages.add(Character.toString(c) + ": no letters (aA-zZ) allowed!");
+            this.isValid = false;
         }
 
         // not number, symbol, operator or ;
         if (!Character.isDigit(c) && !operators.containsKey(Character.toString(c))
                 && !operators.containsKey(Character.toString(c)) && c != ';') {
-            this.errorMessage = Character.toString(c);
-            return true;
+            this.errorMessages.add(Character.toString(c) + ": only numbers and operators(+,-,/,*) allowed!");
+            this.isValid = false;
         }
 
-        return false;
+        // two operators next to each other
+        if (currentIndex + 1 < userInput.length()) {
+            char cc = userInput.charAt(currentIndex + 1);
+            if (operators.containsKey(Character.toString(c)) && operators.containsKey(Character.toString(cc))) {
+                this.errorMessages.add(Character.toString(c) + ", " + Character.toString(cc)
+                        + ": two operators cannot be next to each other");
+                this.isValid = false;
+            }
+        }
+
+        // ; at wrong place
+        if (c == ';' && currentIndex != userInput.length() - 1) {
+            this.errorMessages.add(Character.toString(c) + ": semi-colon only allowed at the end of an expression");
+            this.isValid = false;
+        }
+
+        // ; not after a number
+        if (currentIndex - 1 >= 0) {
+            char cc = userInput.charAt(currentIndex - 1);
+            if (!Character.isDigit(cc)) {
+                this.errorMessages.add(Character.toString(c) + ": semi-colon must follow a digit");
+                this.isValid = false;
+            }
+        }
+
     }
 
     /**
@@ -214,14 +248,20 @@ public class Tokenizer {
      * @
      * ------------------------------------------------
      */
-    public void readInput(String prompt) {
+    public boolean readInput(String prompt) {
         System.out.println("\n" + prompt);
 
         // read current line and add to rest of input
         this.userInput = scanner.nextLine();
 
+        // return false if user entered exit
+        if (userInput.toLowerCase().equals("exit"))
+            return false;
+
         // set current index to 0 incase it was changed
         currentIndex = 0;
+
+        return true;
     }
 
     /**
@@ -253,8 +293,15 @@ public class Tokenizer {
      * returns error message
      * ------------------------------------------------
      */
-    public String getErrorMessage() {
-        return this.errorMessage;
+    public ArrayList<String> getErrorMessages() {
+        return this.errorMessages;
+    }
+
+    public void printErrorMessages() {
+        System.out.println("dskfjnd" + this.errorMessages.size());
+        for (String s : this.errorMessages) {
+            System.out.println(s);
+        }
     }
 
     /**

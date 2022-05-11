@@ -10,10 +10,22 @@ import cte_compiler.icr_generation.TAC_ARG_TYPES;
 import cte_compiler.icr_generation.ThreeAddressCode;
 
 /**
- * TO DO:
+ * ASSEMBLY GENERATOR CLASS
+ *
+ * Uses x64 instruction set, but only uses 32bit registers.
  * 
- * implement register pool manager
- * optimise generated code by performing calculation and MOV result into eax
+ * Converts three address code into assembly instructions.
+ * 
+ * x64 operations used:
+ * - mov --> moves data into a register, 2 operands
+ * - add --> performs addition, 2 operands
+ * - sub --> performs subtraction, 2 operands
+ * - div --> performs division on whatever value is stored in register eax, 1
+ * operand
+ * - imul --> either performs multiplication on value in eax, or performs
+ * multiplication on one register and stores it in another, 1 operand (normal
+ * mul), 2 operands, or 3 operands (stores result in first operand)
+ * 
  * 
  */
 
@@ -377,18 +389,6 @@ public class AssemblyGenerator {
     }
 
     public void printAssemblyStatements() {
-        for (AssemblyStatement statement : this.assemblyStatementQueue) {
-
-            System.out.print(statement.instruction.toString() + " " + statement.arg1.value);
-            if (statement.arg2 != null) {
-                System.out.print(", " + statement.arg2.value);
-            }
-
-            System.out.println();
-        }
-    }
-
-    public void tempPrintAssembly() {
         for (AssemblyStatement statement : this.assemblyStatementQueue) {
 
             System.out.print(statement.instruction.toString() + " " + statement.arg1.value);
