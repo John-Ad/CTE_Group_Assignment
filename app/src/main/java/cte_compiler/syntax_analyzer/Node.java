@@ -13,4 +13,11 @@ public class Node {
         this.value = value;
         this.prev = prev;
     }
+
+    public void print(StringBuilder buffer, String prefix, String childrenPrefix) {
+        buffer.append(prefix);
+        buffer.append(this.value);
+        buffer.append('\n');
+    }
+
 }

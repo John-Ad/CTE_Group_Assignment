@@ -89,7 +89,7 @@ public class Compiler {
         // ---- STAGE 3: convert parse tree into syntax tree ----
         SyntaxTreeGenerator syntaxTreeGenerator = new SyntaxTreeGenerator();
         syntaxTreeGenerator.generate(parseTreeRoot);
-        syntaxTreeGenerator.printInorder(syntaxTreeGenerator.getRoot());
+        syntaxTreeGenerator.printTree(syntaxTreeGenerator.getRoot());
         System.out.println();
 
         // ---- STAGE 4: convert syntax tree to three address codes ----

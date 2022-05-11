@@ -118,6 +118,10 @@ public class SyntaxTreeGenerator {
         printInorder(node.right);
     }
 
+    public void printTree(SyntaxNode root) {
+        root.printTree();
+    }
+
     /**
      * Count Nodes
      * 

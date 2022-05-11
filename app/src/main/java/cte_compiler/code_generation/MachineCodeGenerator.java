@@ -63,6 +63,16 @@ public class MachineCodeGenerator {
         // ADD OPCODE MAPPINGS
         // ------------------------------
 
+        // add eax to r
+        this.addOpcodeMappings.put("r8deax", "11000001 1 110000000");
+        this.addOpcodeMappings.put("r9deax", "11000001 1 110000011");
+        this.addOpcodeMappings.put("r10deax", "11000001 1 110000100");
+        this.addOpcodeMappings.put("r11deax", "11000001 1 110000111");
+        this.addOpcodeMappings.put("r12deax", "11000001 1 110001000");
+        this.addOpcodeMappings.put("r13deax", "11000001 1 110001011");
+        this.addOpcodeMappings.put("r14deax", "11000001 1 110001100");
+        this.addOpcodeMappings.put("r15deax", "11000001 1 110001111");
+
         // add const to r
         this.addOpcodeMappings.put("r8d", "1001001 10000011 11000000");
         this.addOpcodeMappings.put("r9d", "1001001 10000011 11000001");
@@ -435,3 +445,15 @@ public class MachineCodeGenerator {
         }
     }
 }
+
+// ADD r8d, eax
+// ADD r9d, eax
+// ADD r10d, eax
+// ADD r11d, eax
+// ADD r12d, eax
+// ADD r13d, eax
+// ADD r14d, eax
+// ADD r15d, eax
+
+// 41 01 c0 41 01 c1 41 01 c2 41 01 c3 41 01 c4 41 01 c5 41 01 c6 41 01
+// c7

@@ -186,27 +186,8 @@ public class ParseTreeGenerator {
      * @param root
      *             root node to expand on
      */
-    public void printTree(Node root) {
-        ArrayList<Node> queue = new ArrayList<Node>();
-        queue.add(root);
-
-        while (!queue.isEmpty()) {
-
-            // get first node in queue
-            Node currentNode = queue.remove(0);
-
-            // print node value
-            System.out.println(currentNode.value);
-
-            // add children
-            if (currentNode instanceof NonTerminalNode) {
-                NonTerminalNode ntNode = (NonTerminalNode) currentNode;
-                for (Node n : ntNode.children) {
-                    queue.add(n);
-                }
-            }
-
-        }
+    public void printTree(NonTerminalNode root) {
+        root.printTree();
     }
 
     /**
@@ -232,3 +213,26 @@ public class ParseTreeGenerator {
     }
 
 }
+
+// public void printTree(Node root) {
+// ArrayList<Node> queue = new ArrayList<Node>();
+// queue.add(root);
+
+// while (!queue.isEmpty()) {
+
+// // get first node in queue
+// Node currentNode = queue.remove(0);
+
+// // print node value
+// System.out.println(currentNode.value);
+
+// // add children
+// if (currentNode instanceof NonTerminalNode) {
+// NonTerminalNode ntNode = (NonTerminalNode) currentNode;
+// for (Node n : ntNode.children) {
+// queue.add(n);
+// }
+// }
+
+// }
+// }
