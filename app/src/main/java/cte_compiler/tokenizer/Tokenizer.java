@@ -124,7 +124,7 @@ public class Tokenizer {
             return;
         }
 
-        while (userInput.charAt(currentIndex) == '\t' || userInput.charAt(currentIndex) == '\n'
+        while (userInput.charAt(currentIndex) == '\t' || userInput.charAt(currentIndex) == ' '
                 || userInput.charAt(currentIndex) == '\n') {
 
             checkForNewLine();
@@ -164,6 +164,10 @@ public class Tokenizer {
 
         char c = userInput.charAt(currentIndex);
 
+        if (c == ' ' || c == '\t' || c == '\n') {
+            return;
+        }
+
         if (Character.isAlphabetic(c)) {
             this.errorMessages.add(Character.toString(c) + ": no letters (aA-zZ) allowed!");
             this.isValid = false;
@@ -195,7 +199,7 @@ public class Tokenizer {
         // ; not after a number
         if (currentIndex - 1 >= 0) {
             char cc = userInput.charAt(currentIndex - 1);
-            if (!Character.isDigit(cc)) {
+            if (!Character.isDigit(cc) && cc != ' ' && cc != '\t' && cc != '\n') {
                 this.errorMessages.add(Character.toString(c) + ": semi-colon must follow a digit");
                 this.isValid = false;
             }
