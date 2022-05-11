@@ -231,6 +231,147 @@ public class AssemblyGenerator {
         }
     }
 
+    /**
+     * OPTIMISE
+     * 
+     * take the generated assembly statements and optimise them.
+     * 
+     * Optimization rules:
+     * 
+     * (1). replace statements like: imul eax, 9
+     * --------------------------- mov r8d, eax
+     * --------------------- with: imul r8d, eax, 9
+     * 
+     * (2). if 2 mov statements negate each other, eg mov r10d, eax followed by mov
+     * eax, r10d remove both move statements since it ends with eax anyway
+     * 
+     * (3). if a value is moved to a register and that register is then added to
+     * another register immediately afterwards, then just add the value to the
+     * second register instead.
+     * e.g mov r9d, eax
+     * --- add r8d, r9d
+     * becomes: add r8d, eax
+     */
+    public void optimise() {
+
+        int i = 0;
+
+        // ----------------------------------------------------------------
+        // RULE 2, removal of back to back mov ops that negate each other
+        // ----------------------------------------------------------------
+        while (i < this.assemblyStatementQueue.size()) {
+
+            // get first statement to compare
+            AssemblyStatement statement1 = this.assemblyStatementQueue.get(i);
+
+            // if there are back to back statements to compare
+            if (i + 1 < this.assemblyStatementQueue.size()) {
+
+                // get second statement to compare
+                AssemblyStatement statement2 = this.assemblyStatementQueue.get(i + 1);
+
+                // if both statements are mov
+                if (statement1.instruction == ASSEMBLY_KEYWORDS.MOV
+                        && statement2.instruction == ASSEMBLY_KEYWORDS.MOV) {
+
+                    // if s1.arg1 == s2.arg2 and s1.arg2 == s2.arg1
+                    if (statement1.arg1.value == statement2.arg2.value
+                            && statement1.arg2.value == statement2.arg1.value) {
+                        // remove both statements
+                        this.assemblyStatementQueue.remove(i + 1);
+                        this.assemblyStatementQueue.remove(i);
+
+                        // decrease i by 1
+                        i--;
+                    }
+                }
+
+                // ----------------------------------------------------------------
+            }
+            i++;
+        }
+
+        i = 0;
+        // ----------------------------------------------------------
+        // RULE 1, conversion of imul to avoid unnecessary mov
+        // ----------------------------------------------------------
+        while (i < this.assemblyStatementQueue.size()) {
+
+            // get first statement to compare
+            AssemblyStatement statement1 = this.assemblyStatementQueue.get(i);
+
+            // if there are back to back statements to compare
+            if (i + 1 < this.assemblyStatementQueue.size()) {
+
+                // get second statement to compare
+                AssemblyStatement statement2 = this.assemblyStatementQueue.get(i + 1);
+
+                // if s1 == mul op and s2 == mov op
+                if (statement1.instruction == ASSEMBLY_KEYWORDS.MUL
+                        && statement2.instruction == ASSEMBLY_KEYWORDS.MOV) {
+
+                    // if s1 arg1 reg == s2 arg2 reg
+                    if (statement1.arg1.value == statement2.arg2.value) {
+
+                        // create optimised imul
+                        AssemblyStatement optMul = new AssemblyStatement(ASSEMBLY_KEYWORDS.MUL, statement2.arg1,
+                                statement1.arg1);
+                        optMul.arg3 = statement1.arg2;
+
+                        // remove old imul and mov
+                        this.assemblyStatementQueue.remove(i + 1);
+                        this.assemblyStatementQueue.remove(i);
+
+                        // replace with new optimized imul
+                        this.assemblyStatementQueue.add(i, optMul);
+                    }
+                }
+            }
+
+            i++;
+        }
+
+        i = 0;
+        // ----------------------------------------------------------------
+        // RULE 3, removal of unecessary mov before add or sub
+        // ----------------------------------------------------------------
+        while (i < this.assemblyStatementQueue.size()) {
+
+            // get first statement to compare
+            AssemblyStatement statement1 = this.assemblyStatementQueue.get(i);
+
+            // if there are back to back statements to compare
+            if (i + 1 < this.assemblyStatementQueue.size()) {
+
+                // get second statement to compare
+                AssemblyStatement statement2 = this.assemblyStatementQueue.get(i + 1);
+
+                // if s1 == mul op and s2 == mov op
+                if (statement1.instruction == ASSEMBLY_KEYWORDS.MOV
+                        && (statement2.instruction == ASSEMBLY_KEYWORDS.ADD
+                                || statement2.instruction == ASSEMBLY_KEYWORDS.SUB)) {
+
+                    // if s1.arg1 reg == s2.arg2 reg
+                    if (statement1.arg1.value == statement2.arg2.value) {
+
+                        // create optimised add/sub
+                        AssemblyStatement optCode = new AssemblyStatement(statement2.instruction, statement2.arg1,
+                                statement1.arg2);
+
+                        // remove old code
+                        this.assemblyStatementQueue.remove(i + 1);
+                        this.assemblyStatementQueue.remove(i);
+
+                        // replace with new optimized code
+                        this.assemblyStatementQueue.add(i, optCode);
+                    }
+                }
+            }
+
+            i++;
+        }
+    }
+
     public ArrayList<AssemblyStatement> getAssemblyStatements() {
         return this.assemblyStatementQueue;
     }
@@ -241,6 +382,21 @@ public class AssemblyGenerator {
             System.out.print(statement.instruction.toString() + " " + statement.arg1.value);
             if (statement.arg2 != null) {
                 System.out.print(", " + statement.arg2.value);
+            }
+
+            System.out.println();
+        }
+    }
+
+    public void tempPrintAssembly() {
+        for (AssemblyStatement statement : this.assemblyStatementQueue) {
+
+            System.out.print(statement.instruction.toString() + " " + statement.arg1.value);
+            if (statement.arg2 != null) {
+                System.out.print(", " + statement.arg2.value);
+            }
+            if (statement.arg3 != null) {
+                System.out.print(", " + statement.arg3.value);
             }
 
             System.out.println();

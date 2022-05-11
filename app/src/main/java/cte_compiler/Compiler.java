@@ -101,10 +101,14 @@ public class Compiler {
         System.out.println("\n Stage 5 --> assembly code generation");
         AssemblyGenerator assemblyGenerator = new AssemblyGenerator();
         assemblyGenerator.generate(icrGenerator.getReferenceTable(), icrGenerator.getReferenceQueue());
-        assemblyGenerator.printAssemblyStatements();
+        // assemblyGenerator.printAssemblyStatements();
+        assemblyGenerator.tempPrintAssembly();
 
         // ---- STAGE 6: optimise assembly code ----
         // TO BE IMPLEMENTED
+        System.out.println("\n Stage 6 --> assembly code optimization");
+        assemblyGenerator.optimise();
+        assemblyGenerator.tempPrintAssembly();
 
         // ---- STAGE 7: convert assembly into machine code ----
         System.out.println("\n Stage 7 --> machine code generation");

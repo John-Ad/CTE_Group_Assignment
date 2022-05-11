@@ -264,6 +264,16 @@ public class MachineCodeGenerator {
         this.mulOpcodeMappings.put("imul", "1101011 11000000"); // multiply eax by constant and store in eax
                                                                 // this prevents the need to first move const to ebx and
                                                                 // then mul
+
+        // mul by const and store in a r
+        this.mulOpcodeMappings.put("imulr8d", "1000100 1101011 11000000");
+        this.mulOpcodeMappings.put("imulr9d", "1000100 1101011 11001000");
+        this.mulOpcodeMappings.put("imulr10d", "1000100 1101011 11010000");
+        this.mulOpcodeMappings.put("imulr11d", "1000100 1101011 11011000");
+        this.mulOpcodeMappings.put("imulr12d", "1000100 1101011 11100000");
+        this.mulOpcodeMappings.put("imulr13d", "1000100 1101011 11101000");
+        this.mulOpcodeMappings.put("imulr14d", "1000100 1101011 11110000");
+        this.mulOpcodeMappings.put("imulr15d", "1000100 1101011 11111000");
     }
 
     public boolean generateMachineCode(ArrayList<AssemblyStatement> assemblyStatements) {
@@ -323,12 +333,22 @@ public class MachineCodeGenerator {
             // --- MUL OP ---
             if (astmt.instruction == ASSEMBLY_KEYWORDS.MUL) {
 
-                // add start of code
-                machineCode += mulOpcodeMappings.get("imul");
+                Integer argVal = 0;
+                String binary = "";
 
-                // get binary of arg2
-                Integer arg2Val = Integer.parseInt(astmt.arg2.value);
-                String binary = Integer.toBinaryString(arg2Val);
+                // add start of code
+
+                if (astmt.arg3 == null) { // the 2 op regular imul is used
+                    machineCode += mulOpcodeMappings.get("imul");
+                    // get binary of arg2
+                    argVal = Integer.parseInt(astmt.arg2.value);
+                    binary = Integer.toBinaryString(argVal);
+                } else {
+                    machineCode += mulOpcodeMappings.get("imul" + astmt.arg1.value.toLowerCase());
+                    // get binary of arg3
+                    argVal = Integer.parseInt(astmt.arg3.value);
+                    binary = Integer.toBinaryString(argVal);
+                }
 
                 // add constant
                 machineCode += " " + binary;
