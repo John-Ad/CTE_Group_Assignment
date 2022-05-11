@@ -31,6 +31,10 @@ public class Tokenizer {
 
     // ---- CONSTRUCTOR ----
 
+    /**
+     * works by checking indivual character
+     */
+
     public Tokenizer(HashMap<String, String> operators, HashMap<String, String> symbols) {
 
         // init input variables
@@ -298,7 +302,6 @@ public class Tokenizer {
     }
 
     public void printErrorMessages() {
-        System.out.println("dskfjnd" + this.errorMessages.size());
         for (String s : this.errorMessages) {
             System.out.println(s);
         }

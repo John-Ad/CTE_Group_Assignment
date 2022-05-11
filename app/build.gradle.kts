@@ -28,3 +28,7 @@ application {
     // Define the main class for the application.
     mainClass.set("cte_compiler.App")
 }
+
+tasks.jar {
+    manifest.attributes["Main-Class"] = "cte_compiler.App"
+}
